@@ -1,6 +1,6 @@
 package main
 
-import "./handler"
+import "../internal/handler"
 
 func main() {
 	//cmd.CallDao()
