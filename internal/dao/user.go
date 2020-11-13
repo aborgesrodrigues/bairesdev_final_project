@@ -9,9 +9,9 @@ type UserDAO struct {
 
 //UserDAOInterface interface
 type UserDAOInterface interface {
-	Create(domain.Question) (domain.Question, error)
-	FindByID(int) (domain.Question, error)
-	GetAll() ([]domain.Question, error)
+	Create(*domain.User) (*domain.User, error)
+	FindByID(int) (domain.User, error)
+	GetAll() ([]domain.User, error)
 }
 
 // NewUserDAO Constructor of UserDAO struct
@@ -22,14 +22,14 @@ func NewUserDAO() *UserDAO {
 }
 
 // Create func
-func (userDAO UserDAO) Create(user domain.User) (domain.User, error) {
+func (userDAO UserDAO) Create(user *domain.User) (*domain.User, error) {
 	createdUser, err := userDAO.d.create(user)
 
 	if err != nil {
-		return createdUser.(domain.User), err
+		return createdUser.(*domain.User), err
 	}
 
-	return createdUser.(domain.User), nil
+	return createdUser.(*domain.User), nil
 }
 
 // FindByID func

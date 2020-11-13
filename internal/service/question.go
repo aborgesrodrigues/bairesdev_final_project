@@ -15,12 +15,12 @@ type QuestionService struct {
 
 //QuestionServiceInterface interface
 type QuestionServiceInterface interface {
-	Create(domain.Question) (domain.Question, error)
-	Update(domain.Question) (domain.Question, error)
+	Create(domain.Question) (*domain.Question, error)
+	Update(domain.Question) (*domain.Question, error)
 	Delete(int) error
-	FindByID(int) (domain.Question, error)
-	FindByUser(int) ([]domain.Question, error)
-	GetAll() ([]domain.Question, error)
+	FindByID(int) (*domain.Question, error)
+	FindByUser(int) (*[]domain.Question, error)
+	GetAll() (*[]domain.Question, error)
 }
 
 // NewQuestionService constructor of QuestionService struct
@@ -41,23 +41,23 @@ func checkStruct(question domain.Question, checkID bool) bool {
 }
 
 // Create func
-func (srv QuestionService) Create(question domain.Question) (domain.Question, error) {
+func (srv QuestionService) Create(question domain.Question) (*domain.Question, error) {
 	if !checkStruct(question, false) {
-		return domain.Question{}, errors.New("Not all attributes are filled")
+		return &domain.Question{}, errors.New("Not all attributes are filled")
 	}
 
-	return srv.dao.Create(question)
+	return srv.dao.Create(&question)
 }
 
 // Update func
-func (srv QuestionService) Update(question domain.Question) (domain.Question, error) {
+func (srv QuestionService) Update(question domain.Question) (*domain.Question, error) {
 	if !checkStruct(question, true) {
-		return domain.Question{}, errors.New("Not all attributes are filled")
+		return &domain.Question{}, errors.New("Not all attributes are filled")
 	}
 
 	question.UpdatedAt = time.Now()
 
-	return srv.dao.Update(question)
+	return srv.dao.Update(&question)
 }
 
 // Delete func
@@ -66,16 +66,16 @@ func (srv QuestionService) Delete(ID int) error {
 }
 
 // FindByID func
-func (srv QuestionService) FindByID(id int) (domain.Question, error) {
+func (srv QuestionService) FindByID(id int) (*domain.Question, error) {
 	return srv.dao.FindByID(id)
 }
 
 // FindByUser func
-func (srv QuestionService) FindByUser(userID int) ([]domain.Question, error) {
+func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) {
 	return srv.dao.FindByUser(userID)
 }
 
 // GetAll func
-func (srv QuestionService) GetAll() ([]domain.Question, error) {
+func (srv QuestionService) GetAll() (*[]domain.Question, error) {
 	return srv.dao.GetAll()
 }

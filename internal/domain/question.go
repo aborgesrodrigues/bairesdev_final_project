@@ -8,5 +8,5 @@ type Question struct {
 	Statement string `gorm:"not null" json:"statement"`
 	Answer    string `json:"answer"`
 	UserID    int    `gorm:"not null" json:"user_id"`
-	//CreatedUser User   `gorm:"foreignKey:UserID"`
+	User      User   `gorm:"constraint:OnUpdate:PROTECT"`
 }

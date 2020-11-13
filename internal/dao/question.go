@@ -13,12 +13,12 @@ type QuestionDAO struct {
 
 //QuestionDAOInterface interface
 type QuestionDAOInterface interface {
-	Create(domain.Question) (domain.Question, error)
-	Update(domain.Question) (domain.Question, error)
+	Create(*domain.Question) (*domain.Question, error)
+	Update(*domain.Question) (*domain.Question, error)
 	Delete(int) error
-	FindByID(int) (domain.Question, error)
-	FindByUser(int) ([]domain.Question, error)
-	GetAll() ([]domain.Question, error)
+	FindByID(int) (*domain.Question, error)
+	FindByUser(int) (*[]domain.Question, error)
+	GetAll() (*[]domain.Question, error)
 }
 
 // NewQuestionDAO Constructor of QuestionDAO struct
@@ -29,25 +29,25 @@ func NewQuestionDAO() *QuestionDAO {
 }
 
 // Create func
-func (questionDAO QuestionDAO) Create(question domain.Question) (domain.Question, error) {
+func (questionDAO QuestionDAO) Create(question *domain.Question) (*domain.Question, error) {
 	createdQuestion, err := questionDAO.d.create(question)
 
 	if err != nil {
-		return createdQuestion.(domain.Question), err
+		return createdQuestion.(*domain.Question), err
 	}
 
-	return createdQuestion.(domain.Question), nil
+	return createdQuestion.(*domain.Question), nil
 }
 
 // Update func
-func (questionDAO QuestionDAO) Update(question domain.Question) (domain.Question, error) {
+func (questionDAO QuestionDAO) Update(question *domain.Question) (*domain.Question, error) {
 	updatedQuestion, err := questionDAO.d.update(question)
 
 	if err != nil {
-		return updatedQuestion.(domain.Question), err
+		return updatedQuestion.(*domain.Question), err
 	}
 
-	return updatedQuestion.(domain.Question), nil
+	return updatedQuestion.(*domain.Question), nil
 }
 
 // Delete func
@@ -62,18 +62,18 @@ func (questionDAO QuestionDAO) Delete(ID int) error {
 }
 
 // FindByID func
-func (questionDAO QuestionDAO) FindByID(id int) (domain.Question, error) {
+func (questionDAO QuestionDAO) FindByID(id int) (*domain.Question, error) {
 	question, err := questionDAO.d.findByID(&domain.Question{}, id)
 
 	if err != nil {
-		return question.(domain.Question), err
+		return question.(*domain.Question), err
 	}
 
-	return question.(domain.Question), nil
+	return question.(*domain.Question), nil
 }
 
 // FindByUser func
-func (questionDAO QuestionDAO) FindByUser(userID int) ([]domain.Question, error) {
+func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error) {
 	//var user domain.User
 	//userReturned, err := d.findByID(&domain.User{}, userID)
 	// /user := userReturned.(domain.User)
@@ -88,19 +88,20 @@ func (questionDAO QuestionDAO) FindByUser(userID int) ([]domain.Question, error)
 
 	if tx.Error != nil {
 		log.Println(tx.Error.Error())
-		return make([]domain.Question, 0), tx.Error
+		return nil, tx.Error
 	}
 
-	return questions, nil
+	return &questions, nil
 }
 
 // GetAll func
-func (questionDAO QuestionDAO) GetAll() ([]domain.Question, error) {
-	questions, err := questionDAO.d.getAll(make([]domain.Question, 0))
+func (questionDAO QuestionDAO) GetAll() (*[]domain.Question, error) {
+	arr := make([]domain.Question, 0)
+	questions, err := questionDAO.d.getAll(&arr)
 
 	if err != nil {
-		return make([]domain.Question, 0), err
+		return nil, err
 	}
 
-	return questions.([]domain.Question), nil
+	return questions.(*[]domain.Question), nil
 }
