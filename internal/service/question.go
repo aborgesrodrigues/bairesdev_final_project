@@ -10,7 +10,17 @@ import (
 
 // QuestionService struct
 type QuestionService struct {
-	dao *dao.QuestionDAO
+	dao dao.QuestionDAOInterface
+}
+
+//QuestionServiceInterface interface
+type QuestionServiceInterface interface {
+	Create(domain.Question) (domain.Question, error)
+	Update(domain.Question) (domain.Question, error)
+	Delete(int) error
+	FindByID(int) (domain.Question, error)
+	FindByUser(int) ([]domain.Question, error)
+	GetAll() ([]domain.Question, error)
 }
 
 // NewQuestionService constructor of QuestionService struct

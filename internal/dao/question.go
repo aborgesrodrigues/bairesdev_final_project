@@ -11,6 +11,16 @@ type QuestionDAO struct {
 	d *dao
 }
 
+//QuestionDAOInterface interface
+type QuestionDAOInterface interface {
+	Create(domain.Question) (domain.Question, error)
+	Update(domain.Question) (domain.Question, error)
+	Delete(int) error
+	FindByID(int) (domain.Question, error)
+	FindByUser(int) ([]domain.Question, error)
+	GetAll() ([]domain.Question, error)
+}
+
 // NewQuestionDAO Constructor of QuestionDAO struct
 func NewQuestionDAO() *QuestionDAO {
 	questionDAO := &QuestionDAO{}

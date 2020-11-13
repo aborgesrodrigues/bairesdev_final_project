@@ -14,7 +14,7 @@ import (
 
 // QuestionHandler struct
 type QuestionHandler struct {
-	service *service.QuestionService
+	service service.QuestionServiceInterface
 }
 
 // NewQuestionHandler constructor to QuestionHandler struct

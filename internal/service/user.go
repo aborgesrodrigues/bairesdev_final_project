@@ -6,7 +6,16 @@ import (
 )
 
 // UserService struct
-type UserService struct{}
+type UserService struct {
+	dao dao.UserDAOInterface
+}
+
+//UserServiceInterface interface
+type UserServiceInterface interface {
+	Create(domain.User) (domain.User, error)
+	FindByID(int) (domain.User, error)
+	GetAll() ([]domain.User, error)
+}
 
 // NewUserService constructor of UserService struct
 func NewUserService() *UserService {

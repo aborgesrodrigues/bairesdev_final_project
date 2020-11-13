@@ -13,8 +13,18 @@ import (
 	"../service"
 )
 
+// UserHandler struct
+type UserHandler struct {
+	service service.UserServiceInterface
+}
+
+// NewUserHandler constructor to QuestionHandler struct
+func NewUserHandler() *UserHandler {
+	return &UserHandler{service: service.NewUserService()}
+}
+
 //CreateUser func
-func createUser(w http.ResponseWriter, r *http.Request) {
+func (qu *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user domain.User
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -42,7 +52,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetOneUser func
-func getOneUser(w http.ResponseWriter, r *http.Request) {
+func (qu *UserHandler) GetOneUser(w http.ResponseWriter, r *http.Request) {
 	userID := mux.Vars(r)["id"]
 	intUserID, intError := strconv.Atoi(userID)
 
@@ -64,8 +74,8 @@ func getOneUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetOneQuestion func
-func getAllUsers(w http.ResponseWriter, r *http.Request) {
+// GetAllUsers func
+func (qu *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	userService := service.NewUserService()
 	users, error := userService.GetAll()
 
@@ -79,10 +89,11 @@ func getAllUsers(w http.ResponseWriter, r *http.Request) {
 
 // CreateUserRouters func
 func CreateUserRouters(router *mux.Router) {
-	//router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/user", createUser).Methods("POST")
-	router.HandleFunc("/user", getAllUsers).Methods("GET")
-	router.HandleFunc("/user/{id}", getOneUser).Methods("GET")
+	qu := NewUserHandler()
+
+	router.HandleFunc("/user", qu.CreateUser).Methods("POST")
+	router.HandleFunc("/user", qu.GetAllUsers).Methods("GET")
+	router.HandleFunc("/user/{id}", qu.GetOneUser).Methods("GET")
 	//router.HandleFunc("/inventory/{id}", updatePatchProduct).Methods("PATCH")
 	//router.HandleFunc("/inventory/{id}", updateProduct).Methods("PUT")
 	//router.HandleFunc("/inventory/{id}", deleteProduct).Methods("DELETE")

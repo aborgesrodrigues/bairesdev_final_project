@@ -7,6 +7,13 @@ type UserDAO struct {
 	d *dao
 }
 
+//UserDAOInterface interface
+type UserDAOInterface interface {
+	Create(domain.Question) (domain.Question, error)
+	FindByID(int) (domain.Question, error)
+	GetAll() ([]domain.Question, error)
+}
+
 // NewUserDAO Constructor of UserDAO struct
 func NewUserDAO() *UserDAO {
 	userDAO := &UserDAO{}
