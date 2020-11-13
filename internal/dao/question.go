@@ -1,14 +1,16 @@
 package dao
 
 import (
-	"log"
+	"fmt"
 
 	"../domain"
+	"go.uber.org/zap"
 )
 
 // QuestionDAO struct
 type QuestionDAO struct {
-	d *dao
+	d      *dao
+	logger *zap.Logger
 }
 
 //QuestionDAOInterface interface
@@ -22,17 +24,25 @@ type QuestionDAOInterface interface {
 }
 
 // NewQuestionDAO Constructor of QuestionDAO struct
-func NewQuestionDAO() *QuestionDAO {
-	questionDAO := &QuestionDAO{}
-	questionDAO.d = newDAO()
-	return questionDAO
+func NewQuestionDAO(logger *zap.Logger) *QuestionDAO {
+	return &QuestionDAO{d: newDAO(logger), logger: logger}
 }
 
 // Create func
 func (questionDAO QuestionDAO) Create(question *domain.Question) (*domain.Question, error) {
+	// Entry log
+	questionDAO.logger.Info("Called Create",
+		zap.String("question", fmt.Sprintf("%#v", question)),
+	)
+
 	createdQuestion, err := questionDAO.d.create(question)
 
 	if err != nil {
+		// log
+		questionDAO.logger.Error(err.Error(),
+			zap.String("question", fmt.Sprintf("%#v", question)),
+		)
+
 		return createdQuestion.(*domain.Question), err
 	}
 
@@ -41,9 +51,19 @@ func (questionDAO QuestionDAO) Create(question *domain.Question) (*domain.Questi
 
 // Update func
 func (questionDAO QuestionDAO) Update(question *domain.Question) (*domain.Question, error) {
+	// Entry log
+	questionDAO.logger.Info("Called Update",
+		zap.String("question", fmt.Sprintf("%#v", question)),
+	)
+
 	updatedQuestion, err := questionDAO.d.update(question)
 
 	if err != nil {
+		// log
+		questionDAO.logger.Error(err.Error(),
+			zap.String("question", fmt.Sprintf("%#v", question)),
+		)
+
 		return updatedQuestion.(*domain.Question), err
 	}
 
@@ -52,9 +72,19 @@ func (questionDAO QuestionDAO) Update(question *domain.Question) (*domain.Questi
 
 // Delete func
 func (questionDAO QuestionDAO) Delete(ID int) error {
+	// Entry log
+	questionDAO.logger.Info("Called Delete",
+		zap.String("ID", string(ID)),
+	)
+
 	err := questionDAO.d.delete(&domain.Question{}, ID)
 
 	if err != nil {
+		// log
+		questionDAO.logger.Error(err.Error(),
+			zap.String("ID", string(ID)),
+		)
+
 		return err
 	}
 
@@ -62,10 +92,20 @@ func (questionDAO QuestionDAO) Delete(ID int) error {
 }
 
 // FindByID func
-func (questionDAO QuestionDAO) FindByID(id int) (*domain.Question, error) {
-	question, err := questionDAO.d.findByID(&domain.Question{}, id)
+func (questionDAO QuestionDAO) FindByID(ID int) (*domain.Question, error) {
+	// Entry log
+	questionDAO.logger.Info("Called FindByID",
+		zap.String("ID", string(ID)),
+	)
+
+	question, err := questionDAO.d.findByID(&domain.Question{}, ID)
 
 	if err != nil {
+		// log
+		questionDAO.logger.Error(err.Error(),
+			zap.String("question", fmt.Sprintf("%#v", question)),
+		)
+
 		return question.(*domain.Question), err
 	}
 
@@ -74,20 +114,17 @@ func (questionDAO QuestionDAO) FindByID(id int) (*domain.Question, error) {
 
 // FindByUser func
 func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error) {
-	//var user domain.User
-	//userReturned, err := d.findByID(&domain.User{}, userID)
-	// /user := userReturned.(domain.User)
-
-	//if err != nil {
-	//	log.Println(err.Error())
-	//	return []domain.Question{}, err
-	//}
+	// Entry log
+	questionDAO.logger.Info("Called FindByUser",
+		zap.String("userID", string(userID)),
+	)
 
 	var questions = make([]domain.Question, 0)
 	tx := questionDAO.d.db.Where(&domain.Question{UserID: userID}).Find(&questions)
 
 	if tx.Error != nil {
-		log.Println(tx.Error.Error())
+		// log
+		questionDAO.logger.Error(tx.Error.Error())
 		return nil, tx.Error
 	}
 
@@ -96,10 +133,15 @@ func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error
 
 // GetAll func
 func (questionDAO QuestionDAO) GetAll() (*[]domain.Question, error) {
+	// Entry log
+	questionDAO.logger.Info("Called GetAll")
+
 	arr := make([]domain.Question, 0)
 	questions, err := questionDAO.d.getAll(&arr)
 
 	if err != nil {
+		// log
+		questionDAO.logger.Error(err.Error())
 		return nil, err
 	}
 

@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 
 	"../domain"
 	"../service"
@@ -16,34 +17,63 @@ import (
 // UserHandler struct
 type UserHandler struct {
 	service service.UserServiceInterface
+	logger  *zap.Logger
 }
 
 // NewUserHandler constructor to QuestionHandler struct
 func NewUserHandler() *UserHandler {
-	return &UserHandler{service: service.NewUserService()}
+	logger, _ := zap.NewProduction()
+	return &UserHandler{service: service.NewUserService(logger), logger: logger}
 }
 
 //CreateUser func
 func (qu *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	// log
+	defer qu.logger.Sync()
+
 	var user domain.User
 	reqBody, err := ioutil.ReadAll(r.Body)
+
+	// Entry log
+	qu.logger.Info("Fetched CreateUser",
+		zap.String("url", r.URL.Path),
+		zap.String("body", string(reqBody)),
+	)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Kindly enter data with the Product title and description only in order to update")
+
+		//log
+		qu.logger.Error(err.Error(),
+			zap.String("url", r.URL.Path),
+			zap.String("body", string(reqBody)),
+		)
 		return
 	}
 	err = json.Unmarshal(reqBody, &user)
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+
+		//log
+		qu.logger.Error(err.Error(),
+			zap.String("url", r.URL.Path),
+			zap.String("body", string(reqBody)),
+		)
 		return
 	}
 
-	userService := service.NewUserService()
-	createdUser, error := userService.Create(user)
+	createdUser, error := qu.service.Create(user)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
+
+		//log
+		qu.logger.Error(error.Error(),
+			zap.String("url", r.URL.Path),
+			zap.String("body", string(reqBody)),
+		)
 		return
 	}
 
@@ -53,20 +83,40 @@ func (qu *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // GetOneUser func
 func (qu *UserHandler) GetOneUser(w http.ResponseWriter, r *http.Request) {
+	// log
+	defer qu.logger.Sync()
+
+	// Entry log
+	qu.logger.Info("Fetched GetQuestionsByUser",
+		zap.String("url", r.URL.Path),
+		zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+	)
+
 	userID := mux.Vars(r)["id"]
 	intUserID, intError := strconv.Atoi(userID)
 
 	if intError != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Invalid number")
+
+		//log
+		qu.logger.Error(intError.Error(),
+			zap.String("url", r.URL.Path),
+			zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+		)
 		return
 	}
 
-	userService := service.NewUserService()
-	user, error := userService.FindByID(intUserID)
+	user, error := qu.service.FindByID(intUserID)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
+
+		//log
+		qu.logger.Error(error.Error(),
+			zap.String("url", r.URL.Path),
+			zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+		)
 		return
 	}
 
@@ -76,11 +126,24 @@ func (qu *UserHandler) GetOneUser(w http.ResponseWriter, r *http.Request) {
 
 // GetAllUsers func
 func (qu *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	userService := service.NewUserService()
-	users, error := userService.GetAll()
+	// log
+	defer qu.logger.Sync()
+
+	// Entry log
+	qu.logger.Info("Fetched GetQuestionsByUser",
+		zap.String("url", r.URL.Path),
+	)
+
+	users, error := qu.service.GetAll()
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
+
+		//log
+		qu.logger.Error(error.Error(),
+			zap.String("url", r.URL.Path),
+			zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+		)
 		return
 	}
 
@@ -94,8 +157,4 @@ func CreateUserRouters(router *mux.Router) {
 	router.HandleFunc("/user", qu.CreateUser).Methods("POST")
 	router.HandleFunc("/user", qu.GetAllUsers).Methods("GET")
 	router.HandleFunc("/user/{id}", qu.GetOneUser).Methods("GET")
-	//router.HandleFunc("/inventory/{id}", updatePatchProduct).Methods("PATCH")
-	//router.HandleFunc("/inventory/{id}", updateProduct).Methods("PUT")
-	//router.HandleFunc("/inventory/{id}", deleteProduct).Methods("DELETE")
-	//log.Fatal(http.ListenAndServe(":8080", router))
 }

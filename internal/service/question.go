@@ -2,15 +2,19 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
 
 	"../dao"
 	"../domain"
+	"go.uber.org/zap"
 )
 
 // QuestionService struct
 type QuestionService struct {
-	dao dao.QuestionDAOInterface
+	dao    dao.QuestionDAOInterface
+	logger *zap.Logger
 }
 
 //QuestionServiceInterface interface
@@ -24,12 +28,18 @@ type QuestionServiceInterface interface {
 }
 
 // NewQuestionService constructor of QuestionService struct
-func NewQuestionService() *QuestionService {
-	return &QuestionService{dao: dao.NewQuestionDAO()}
+func NewQuestionService(logger *zap.Logger) *QuestionService {
+	return &QuestionService{dao: dao.NewQuestionDAO(logger), logger: logger}
 }
 
 // Check if all attributes are filled
-func checkStruct(question domain.Question, checkID bool) bool {
+func (srv QuestionService) checkStruct(question domain.Question, checkID bool) bool {
+	// Entry log
+	srv.logger.Info("Called checkStruct",
+		zap.String("question", fmt.Sprintf("%#v", question)),
+		zap.String("checkID", strconv.FormatBool(checkID)),
+	)
+
 	if (question.ID == 0 && checkID) ||
 		question.Statement == "" ||
 		question.UserID == 0 {
@@ -42,8 +52,18 @@ func checkStruct(question domain.Question, checkID bool) bool {
 
 // Create func
 func (srv QuestionService) Create(question domain.Question) (*domain.Question, error) {
-	if !checkStruct(question, false) {
-		return &domain.Question{}, errors.New("Not all attributes are filled")
+	// Entry log
+	srv.logger.Info("Called Create",
+		zap.String("question", fmt.Sprintf("%#v", question)),
+	)
+
+	if !srv.checkStruct(question, false) {
+		//log
+		message := "Not all attributes are filled"
+		srv.logger.Info(message,
+			zap.String("question", fmt.Sprintf("%#v", question)),
+		)
+		return &domain.Question{}, errors.New(message)
 	}
 
 	return srv.dao.Create(&question)
@@ -51,8 +71,19 @@ func (srv QuestionService) Create(question domain.Question) (*domain.Question, e
 
 // Update func
 func (srv QuestionService) Update(question domain.Question) (*domain.Question, error) {
-	if !checkStruct(question, true) {
-		return &domain.Question{}, errors.New("Not all attributes are filled")
+	// Entry log
+	srv.logger.Info("Called Update",
+		zap.String("question", fmt.Sprintf("%#v", question)),
+	)
+
+	if !srv.checkStruct(question, true) {
+		//log
+		message := "Not all attributes are filled"
+		srv.logger.Info(message,
+			zap.String("question", fmt.Sprintf("%#v", question)),
+		)
+
+		return &domain.Question{}, errors.New(message)
 	}
 
 	question.UpdatedAt = time.Now()
@@ -62,20 +93,38 @@ func (srv QuestionService) Update(question domain.Question) (*domain.Question, e
 
 // Delete func
 func (srv QuestionService) Delete(ID int) error {
+	// Entry log
+	srv.logger.Info("Called Delete",
+		zap.String("ID", string(ID)),
+	)
+
 	return srv.dao.Delete(ID)
 }
 
 // FindByID func
-func (srv QuestionService) FindByID(id int) (*domain.Question, error) {
-	return srv.dao.FindByID(id)
+func (srv QuestionService) FindByID(ID int) (*domain.Question, error) {
+	// Entry log
+	srv.logger.Info("Called FindByID",
+		zap.String("ID", string(ID)),
+	)
+
+	return srv.dao.FindByID(ID)
 }
 
 // FindByUser func
 func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) {
+	// Entry log
+	srv.logger.Info("Called FindByUser",
+		zap.String("userID", string(userID)),
+	)
+
 	return srv.dao.FindByUser(userID)
 }
 
 // GetAll func
 func (srv QuestionService) GetAll() (*[]domain.Question, error) {
+	// Entry log
+	srv.logger.Info("Called GetAll")
+
 	return srv.dao.GetAll()
 }

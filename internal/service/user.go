@@ -1,38 +1,55 @@
 package service
 
 import (
+	"fmt"
+
 	"../dao"
 	"../domain"
+	"go.uber.org/zap"
 )
 
 // UserService struct
 type UserService struct {
-	dao dao.UserDAOInterface
+	dao    dao.UserDAOInterface
+	logger *zap.Logger
 }
 
 //UserServiceInterface interface
 type UserServiceInterface interface {
 	Create(domain.User) (*domain.User, error)
-	FindByID(int) (domain.User, error)
+	FindByID(int) (*domain.User, error)
 	GetAll() ([]domain.User, error)
 }
 
 // NewUserService constructor of UserService struct
-func NewUserService() *UserService {
-	return &UserService{dao: dao.NewUserDAO()}
+func NewUserService(logger *zap.Logger) *UserService {
+	return &UserService{dao: dao.NewUserDAO(logger), logger: logger}
 }
 
 // FindByID func
-func (srv UserService) FindByID(id int) (domain.User, error) {
-	return srv.dao.FindByID(id)
+func (srv UserService) FindByID(ID int) (*domain.User, error) {
+	// Entry log
+	srv.logger.Info("Called FindByID",
+		zap.String("ID", string(ID)),
+	)
+
+	return srv.dao.FindByID(ID)
 }
 
 // Create func
 func (srv UserService) Create(user domain.User) (*domain.User, error) {
+	// Entry log
+	srv.logger.Info("Called Create",
+		zap.String("user", fmt.Sprintf("%#v", user)),
+	)
+
 	return srv.dao.Create(&user)
 }
 
 // GetAll func
 func (srv UserService) GetAll() ([]domain.User, error) {
+	// Entry log
+	srv.logger.Info("Called GetAll")
+
 	return srv.dao.GetAll()
 }
