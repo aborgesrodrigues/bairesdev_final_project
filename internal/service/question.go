@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"time"
 
 	"../dao"
@@ -15,8 +16,25 @@ func NewQuestionService() *QuestionService {
 	return &QuestionService{}
 }
 
+// Check if all attributes are filled
+func checkStruct(question domain.Question, checkID bool) bool {
+	if (question.ID == 0 && checkID) ||
+		question.Statement == "" ||
+		question.UserID == 0 {
+
+		return false
+	}
+
+	return true
+}
+
 // Create func
 func (questionService QuestionService) Create(question domain.Question) (domain.Question, error) {
+	if !checkStruct(question, false) {
+		emptyQuestion := &domain.Question{}
+		return *emptyQuestion, errors.New("Not all attributes are filled")
+	}
+
 	questionDAO := dao.NewQuestionDAO()
 
 	return questionDAO.Create(question)
@@ -24,6 +42,11 @@ func (questionService QuestionService) Create(question domain.Question) (domain.
 
 // Update func
 func (questionService QuestionService) Update(question domain.Question) (domain.Question, error) {
+	if !checkStruct(question, true) {
+		emptyQuestion := &domain.Question{}
+		return *emptyQuestion, errors.New("Not all attributes are filled")
+	}
+
 	questionDAO := dao.NewQuestionDAO()
 	question.UpdatedAt = time.Now()
 

@@ -71,7 +71,7 @@ func updateQuestion(w http.ResponseWriter, r *http.Request) {
 
 	if int(question.ID) != intID {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(question)
+		fmt.Fprintf(w, "ID of the question is different of the parameter")
 		return
 	}
 
