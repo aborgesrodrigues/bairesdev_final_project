@@ -7,5 +7,6 @@ type Question struct {
 	gorm.Model
 	Statement string `gorm:"not null" json:"statement"`
 	Answer    string `json:"answer"`
-	User      User   `gorm:"not null" json:"user"`
+	UserID    int    `gorm:"not null" json:"user_id"`
+	//CreatedUser User   `gorm:"foreignKey:UserID"`
 }

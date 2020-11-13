@@ -6,7 +6,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
-	"../domain"
+	"../internal/domain"
 )
 
 // PopulateUser func

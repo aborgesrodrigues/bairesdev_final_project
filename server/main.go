@@ -1,6 +1,15 @@
 package main
 
-import "../internal/handler"
+import (
+	"log"
+	"net/http"
+
+	"../internal/handler"
+	"github.com/gorilla/mux"
+)
+
+//"../internal/handler"
+//"../cmd"
 
 func main() {
 	//cmd.CallDao()
@@ -8,5 +17,8 @@ func main() {
 	//cmd.CreateDatabase()
 	//cmd.PopulateUser()
 
-	handler.CreateUserRouters()
+	router := mux.NewRouter().StrictSlash(true)
+	handler.CreateUserRouters(router)
+	handler.CreateQuestionRouters(router)
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

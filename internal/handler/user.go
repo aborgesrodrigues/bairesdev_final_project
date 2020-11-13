@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -30,7 +29,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userService := &service.UserService{}
+	userService := service.NewUserService()
 	createdUser, error := userService.Create(user)
 
 	if error != nil {
@@ -53,7 +52,7 @@ func getOneUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userService := &service.UserService{}
+	userService := service.NewUserService()
 	user, error := userService.FindByID(intUserID)
 
 	if error != nil {
@@ -65,14 +64,27 @@ func getOneUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetOneQuestion func
+func getAllUsers(w http.ResponseWriter, r *http.Request) {
+	userService := service.NewUserService()
+	users, error := userService.GetAll()
+
+	if error != nil {
+		fmt.Fprintf(w, error.Error())
+		return
+	}
+
+	json.NewEncoder(w).Encode(users)
+}
+
 // CreateUserRouters func
-func CreateUserRouters() {
-	router := mux.NewRouter().StrictSlash(true)
+func CreateUserRouters(router *mux.Router) {
+	//router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/user", createUser).Methods("POST")
-	//router.HandleFunc("/inventory", getAllProducts).Methods("GET")
+	router.HandleFunc("/user", getAllUsers).Methods("GET")
 	router.HandleFunc("/user/{id}", getOneUser).Methods("GET")
 	//router.HandleFunc("/inventory/{id}", updatePatchProduct).Methods("PATCH")
 	//router.HandleFunc("/inventory/{id}", updateProduct).Methods("PUT")
 	//router.HandleFunc("/inventory/{id}", deleteProduct).Methods("DELETE")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	//log.Fatal(http.ListenAndServe(":8080", router))
 }
