@@ -14,7 +14,7 @@ type QuestionDAO struct {
 // NewQuestionDAO Constructor of QuestionDAO struct
 func NewQuestionDAO() *QuestionDAO {
 	questionDAO := &QuestionDAO{}
-	questionDAO.d = NewDAO()
+	questionDAO.d = newDAO()
 	return questionDAO
 }
 

@@ -12,8 +12,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//CreateQuestion func
-func createQuestion(w http.ResponseWriter, r *http.Request) {
+// QuestionHandler struct
+type QuestionHandler struct {
+	service *service.QuestionService
+}
+
+// NewQuestionHandler constructor to QuestionHandler struct
+func NewQuestionHandler() *QuestionHandler {
+	return &QuestionHandler{service: service.NewQuestionService()}
+}
+
+//CreateQuestion creates a new question
+func (qh *QuestionHandler) CreateQuestion(w http.ResponseWriter, r *http.Request) {
 	var question domain.Question
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -28,8 +38,7 @@ func createQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	questionService := service.NewQuestionService()
-	createdQuestion, error := questionService.Create(question)
+	createdQuestion, error := qh.service.Create(question)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -40,8 +49,8 @@ func createQuestion(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(createdQuestion)
 }
 
-//CreateQuestion func
-func updateQuestion(w http.ResponseWriter, r *http.Request) {
+//UpdateQuestion updates existing question
+func (qh *QuestionHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request) {
 	var question domain.Question
 
 	// get the parameter
@@ -76,8 +85,7 @@ func updateQuestion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// call the service to update the question
-	questionService := service.NewQuestionService()
-	updatedQuestion, error := questionService.Update(question)
+	updatedQuestion, error := qh.service.Update(question)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -87,8 +95,8 @@ func updateQuestion(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updatedQuestion)
 }
 
-//CreateQuestion func
-func deleteQuestion(w http.ResponseWriter, r *http.Request) {
+//DeleteQuestion deletes a question
+func (qh *QuestionHandler) DeleteQuestion(w http.ResponseWriter, r *http.Request) {
 	// get the parameter
 	ID := mux.Vars(r)["id"]
 	intID, intError := strconv.Atoi(ID)
@@ -99,8 +107,7 @@ func deleteQuestion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// call the service to update the question
-	questionService := service.NewQuestionService()
-	error := questionService.Delete(intID)
+	error := qh.service.Delete(intID)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -110,10 +117,9 @@ func deleteQuestion(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("File deleted")
 }
 
-// GetOneQuestion func
-func getAllQuestions(w http.ResponseWriter, r *http.Request) {
-	questionService := service.NewQuestionService()
-	questions, error := questionService.GetAll()
+// GetAllQuestions return all existing questions
+func (qh *QuestionHandler) GetAllQuestions(w http.ResponseWriter, r *http.Request) {
+	questions, error := qh.service.GetAll()
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -123,8 +129,8 @@ func getAllQuestions(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(questions)
 }
 
-// GetOneQuestion func
-func getQuestionsByUser(w http.ResponseWriter, r *http.Request) {
+// GetQuestionsByUser returns all the questions of an user
+func (qh *QuestionHandler) GetQuestionsByUser(w http.ResponseWriter, r *http.Request) {
 	// get the user_id var
 	userID := mux.Vars(r)["user_id"]
 	intUserID, intError := strconv.Atoi(userID)
@@ -135,8 +141,7 @@ func getQuestionsByUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// call the service to find question by user
-	questionService := service.NewQuestionService()
-	questions, error := questionService.FindByUser(intUserID)
+	questions, error := qh.service.FindByUser(intUserID)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -144,14 +149,14 @@ func getQuestionsByUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(questions)
-
 }
 
 // CreateQuestionRouters func
 func CreateQuestionRouters(router *mux.Router) {
-	router.HandleFunc("/question", createQuestion).Methods("POST")
-	router.HandleFunc("/question", getAllQuestions).Methods("GET")
-	router.HandleFunc("/question/user/{user_id}", getQuestionsByUser).Methods("GET")
-	router.HandleFunc("/question/{id}", updateQuestion).Methods("PUT")
-	router.HandleFunc("/question/{id}", deleteQuestion).Methods("DELETE")
+	qh := NewQuestionHandler()
+	router.HandleFunc("/question", qh.CreateQuestion).Methods("POST")
+	router.HandleFunc("/question", qh.GetAllQuestions).Methods("GET")
+	router.HandleFunc("/question/user/{user_id}", qh.GetQuestionsByUser).Methods("GET")
+	router.HandleFunc("/question/{id}", qh.UpdateQuestion).Methods("PUT")
+	router.HandleFunc("/question/{id}", qh.DeleteQuestion).Methods("DELETE")
 }

@@ -10,7 +10,7 @@ type UserDAO struct {
 // NewUserDAO Constructor of UserDAO struct
 func NewUserDAO() *UserDAO {
 	userDAO := &UserDAO{}
-	userDAO.d = NewDAO()
+	userDAO.d = newDAO()
 	return userDAO
 }
 

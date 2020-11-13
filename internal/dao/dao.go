@@ -18,8 +18,8 @@ type dao struct {
 	db *gorm.DB
 }
 
-// NewDAO Constructor of dao struct
-func NewDAO() *dao {
+// newDAO Constructor of dao struct
+func newDAO() *dao {
 	d := &dao{}
 	d.setConnection()
 	return d
@@ -49,10 +49,6 @@ func (d *dao) getType(domainStruct interface{}) interface{} {
 
 func (d *dao) create(domainStruct interface{}) (interface{}, error) {
 	var tx *gorm.DB
-	//d.setConnection()
-
-	// domainConverted := d.getType(domainStruct)
-	// tx = d.db.Create(&domainConverted)
 
 	switch domainStruct.(type) {
 	case domain.User:
@@ -64,6 +60,8 @@ func (d *dao) create(domainStruct interface{}) (interface{}, error) {
 		tx = d.db.Create(&question)
 		domainStruct = question
 	}
+
+	//tx = d.db.Create(domainStruct)
 
 	if tx.Error != nil {
 		log.Println(tx.Error.Error())
