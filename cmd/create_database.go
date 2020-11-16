@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"../internal/domain"
+	"final_project/internal/domain"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )

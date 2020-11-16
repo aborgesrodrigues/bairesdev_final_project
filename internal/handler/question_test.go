@@ -10,8 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"../domain"
-	"../handler"
+	"final_project/internal/domain"
+
+	"final_project/internal/handler"
+
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"

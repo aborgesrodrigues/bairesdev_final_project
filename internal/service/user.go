@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"../dao"
-	"../domain"
+	"final_project/internal/dao"
+	"final_project/internal/domain"
+
 	"go.uber.org/zap"
 )
 

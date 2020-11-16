@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"../domain"
-	"../service"
+	"final_project/internal/domain"
+	"final_project/internal/service"
+
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )

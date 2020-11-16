@@ -1,3 +1,4 @@
+//go:generate mockgen -source question.go -destination question_mock.go -package mockQuestionInterface
 package service
 
 import (
@@ -6,8 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"../dao"
-	"../domain"
+	"final_project/internal/dao"
+	"final_project/internal/domain"
+
 	"go.uber.org/zap"
 )
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"../internal/domain"
-	"../internal/service"
+	"final_project/internal/domain"
+	"final_project/internal/service"
 )
 
 // CallService func

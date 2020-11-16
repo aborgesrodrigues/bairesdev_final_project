@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"../internal/dao"
+	"final_project/internal/dao"
 )
 
 //CallDao func
