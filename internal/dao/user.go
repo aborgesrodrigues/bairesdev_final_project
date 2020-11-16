@@ -2,6 +2,7 @@ package dao
 
 import (
 	"fmt"
+	"strconv"
 
 	"../domain"
 	"go.uber.org/zap"
@@ -50,7 +51,7 @@ func (userDAO UserDAO) Create(user *domain.User) (*domain.User, error) {
 func (userDAO UserDAO) FindByID(ID int) (*domain.User, error) {
 	// Entry log
 	userDAO.logger.Info("Called FindByID",
-		zap.String("ID", string(ID)),
+		zap.String("ID", strconv.Itoa(ID)),
 	)
 
 	user, err := userDAO.d.findByID(&domain.User{}, ID)

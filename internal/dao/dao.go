@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"errors"
 	"fmt"
+	"os"
 
 	"go.uber.org/zap"
 	"gorm.io/driver/sqlite"
@@ -21,13 +23,14 @@ func newDAO(logger *zap.Logger) *dao {
 }
 
 func (d *dao) setConnection() {
+	var sqlitePath = os.Getenv("SQLITEPATH")
 	// Entry log
 	d.logger.Info("Called setConnection",
-		zap.String("path_database", "./sqlite-database.db"),
+		zap.String("path_database", sqlitePath),
 	)
 
 	var err error
-	d.db, err = gorm.Open(sqlite.Open("./sqlite-database.db"), &gorm.Config{})
+	d.db, err = gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{})
 
 	if err != nil {
 		// log
@@ -72,6 +75,12 @@ func (d *dao) update(domainStruct interface{}) (interface{}, error) {
 			zap.String("domainStruct", fmt.Sprintf("%#v", domainStruct)),
 		)
 		return domainStruct, tx.Error
+	} else if tx.RowsAffected == 0 {
+		// log
+		d.logger.Error(tx.Error.Error(),
+			zap.String("domainStruct", fmt.Sprintf("%#v", domainStruct)),
+		)
+		return domainStruct, errors.New("ID not found")
 	}
 
 	return domainStruct, nil
@@ -93,6 +102,12 @@ func (d *dao) delete(domainStruct interface{}, ID int) error {
 			zap.String("domainStruct", fmt.Sprintf("%#v", domainStruct)),
 		)
 		return tx.Error
+	} else if tx.RowsAffected == 0 {
+		// log
+		d.logger.Error(tx.Error.Error(),
+			zap.String("domainStruct", fmt.Sprintf("%#v", domainStruct)),
+		)
+		return errors.New("ID not found")
 	}
 
 	return nil

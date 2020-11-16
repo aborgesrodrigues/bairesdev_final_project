@@ -95,7 +95,7 @@ func (srv QuestionService) Update(question domain.Question) (*domain.Question, e
 func (srv QuestionService) Delete(ID int) error {
 	// Entry log
 	srv.logger.Info("Called Delete",
-		zap.String("ID", string(ID)),
+		zap.String("ID", strconv.Itoa(ID)),
 	)
 
 	return srv.dao.Delete(ID)
@@ -105,7 +105,7 @@ func (srv QuestionService) Delete(ID int) error {
 func (srv QuestionService) FindByID(ID int) (*domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called FindByID",
-		zap.String("ID", string(ID)),
+		zap.String("ID", strconv.Itoa(ID)),
 	)
 
 	return srv.dao.FindByID(ID)
@@ -115,7 +115,7 @@ func (srv QuestionService) FindByID(ID int) (*domain.Question, error) {
 func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called FindByUser",
-		zap.String("userID", string(userID)),
+		zap.String("userID", strconv.Itoa(userID)),
 	)
 
 	return srv.dao.FindByUser(userID)

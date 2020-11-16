@@ -15,14 +15,14 @@ import (
 
 // QuestionHandler struct
 type QuestionHandler struct {
-	service service.QuestionServiceInterface
+	Service service.QuestionServiceInterface
 	logger  *zap.Logger
 }
 
 // NewQuestionHandler constructor to QuestionHandler struct
 func NewQuestionHandler() *QuestionHandler {
 	logger, _ := zap.NewProduction()
-	return &QuestionHandler{service: service.NewQuestionService(logger), logger: logger}
+	return &QuestionHandler{Service: service.NewQuestionService(logger), logger: logger}
 }
 
 //CreateQuestion creates a new question
@@ -52,8 +52,8 @@ func (qh *QuestionHandler) CreateQuestion(w http.ResponseWriter, r *http.Request
 	}
 	err = json.Unmarshal(reqBody, &question)
 	if err != nil {
-		fmt.Fprintf(w, err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, err.Error())
 
 		//log
 		qh.logger.Error(err.Error(),
@@ -63,9 +63,12 @@ func (qh *QuestionHandler) CreateQuestion(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	createdQuestion, error := qh.service.Create(question)
+	createdQuestion, error := qh.Service.Create(question)
 
 	if error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, error.Error())
+
 		//log
 		qh.logger.Error(error.Error(),
 			zap.String("url", r.URL.Path),
@@ -115,6 +118,7 @@ func (qh *QuestionHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request
 	intID, intError := strconv.Atoi(ID)
 
 	if intError != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, intError.Error())
 
 		//log
@@ -157,9 +161,10 @@ func (qh *QuestionHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request
 	}
 
 	// call the service to update the question
-	updatedQuestion, error := qh.service.Update(question)
+	updatedQuestion, error := qh.Service.Update(question)
 
 	if error != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, error.Error())
 
 		//log
@@ -189,14 +194,16 @@ func (qh *QuestionHandler) DeleteQuestion(w http.ResponseWriter, r *http.Request
 	intID, intError := strconv.Atoi(ID)
 
 	if intError != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, intError.Error())
 		return
 	}
 
 	// call the service to update the question
-	error := qh.service.Delete(intID)
+	error := qh.Service.Delete(intID)
 
 	if error != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, error.Error())
 
 		//log
@@ -220,7 +227,7 @@ func (qh *QuestionHandler) GetAllQuestions(w http.ResponseWriter, r *http.Reques
 		zap.String("url", r.URL.Path),
 	)
 
-	questions, error := qh.service.GetAll()
+	questions, error := qh.Service.GetAll()
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -263,7 +270,7 @@ func (qh *QuestionHandler) GetQuestionsByUser(w http.ResponseWriter, r *http.Req
 	}
 
 	// call the service to find question by user
-	questions, error := qh.service.FindByUser(intUserID)
+	questions, error := qh.Service.FindByUser(intUserID)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -41,7 +42,7 @@ func PopulateUser() {
 		Birthday: user4Birthday,
 	}
 
-	db, _ := gorm.Open(sqlite.Open("sqlite-database.db"), &gorm.Config{})
+	db, _ := gorm.Open(sqlite.Open(os.Getenv("SQLITEPATH")+"sqlite-database.db"), &gorm.Config{})
 
 	db.Create(&user1)
 	db.Create(&user2)

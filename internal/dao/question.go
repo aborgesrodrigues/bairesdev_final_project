@@ -2,6 +2,7 @@ package dao
 
 import (
 	"fmt"
+	"strconv"
 
 	"../domain"
 	"go.uber.org/zap"
@@ -74,7 +75,7 @@ func (questionDAO QuestionDAO) Update(question *domain.Question) (*domain.Questi
 func (questionDAO QuestionDAO) Delete(ID int) error {
 	// Entry log
 	questionDAO.logger.Info("Called Delete",
-		zap.String("ID", string(ID)),
+		zap.String("ID", strconv.Itoa(ID)),
 	)
 
 	err := questionDAO.d.delete(&domain.Question{}, ID)
@@ -82,7 +83,7 @@ func (questionDAO QuestionDAO) Delete(ID int) error {
 	if err != nil {
 		// log
 		questionDAO.logger.Error(err.Error(),
-			zap.String("ID", string(ID)),
+			zap.String("ID", strconv.Itoa(ID)),
 		)
 
 		return err
@@ -95,7 +96,7 @@ func (questionDAO QuestionDAO) Delete(ID int) error {
 func (questionDAO QuestionDAO) FindByID(ID int) (*domain.Question, error) {
 	// Entry log
 	questionDAO.logger.Info("Called FindByID",
-		zap.String("ID", string(ID)),
+		zap.String("ID", strconv.Itoa(ID)),
 	)
 
 	question, err := questionDAO.d.findByID(&domain.Question{}, ID)
@@ -116,7 +117,7 @@ func (questionDAO QuestionDAO) FindByID(ID int) (*domain.Question, error) {
 func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error) {
 	// Entry log
 	questionDAO.logger.Info("Called FindByUser",
-		zap.String("userID", string(userID)),
+		zap.String("userID", strconv.Itoa(userID)),
 	)
 
 	var questions = make([]domain.Question, 0)

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 
 	"../dao"
 	"../domain"
@@ -30,7 +31,7 @@ func NewUserService(logger *zap.Logger) *UserService {
 func (srv UserService) FindByID(ID int) (*domain.User, error) {
 	// Entry log
 	srv.logger.Info("Called FindByID",
-		zap.String("ID", string(ID)),
+		zap.String("ID", strconv.Itoa(ID)),
 	)
 
 	return srv.dao.FindByID(ID)
