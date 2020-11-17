@@ -15,6 +15,8 @@ type QuestionDAO struct {
 	logger *zap.Logger
 }
 
+//go:generate mockgen -source=question.go -destination=question_mock.go -package=dao
+
 //QuestionDAOInterface interface
 type QuestionDAOInterface interface {
 	Create(*domain.Question) (*domain.Question, error)

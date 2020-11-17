@@ -15,6 +15,8 @@ type UserDAO struct {
 	logger *zap.Logger
 }
 
+//go:generate mockgen -source=user.go -destination=user_mock.go -package=dao
+
 //UserDAOInterface interface
 type UserDAOInterface interface {
 	Create(*domain.User) (*domain.User, error)

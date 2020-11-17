@@ -1,4 +1,3 @@
-//go:generate mockgen -source question.go -destination question_mock.go -package service
 package service
 
 import (
@@ -18,6 +17,8 @@ type QuestionService struct {
 	dao    dao.QuestionDAOInterface
 	logger *zap.Logger
 }
+
+//go:generate mockgen -source=question.go -destination=question_mock.go -package=service
 
 //QuestionServiceInterface interface
 type QuestionServiceInterface interface {

@@ -16,6 +16,8 @@ type UserService struct {
 	logger *zap.Logger
 }
 
+//go:generate mockgen -source=user.go -destination=user_mock.go -package=service
+
 //UserServiceInterface interface
 type UserServiceInterface interface {
 	Create(domain.User) (*domain.User, error)
