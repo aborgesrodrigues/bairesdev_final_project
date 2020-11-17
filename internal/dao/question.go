@@ -7,6 +7,7 @@ import (
 	"bairesdev_final_project/internal/domain"
 
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // QuestionDAO struct
@@ -124,7 +125,7 @@ func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error
 	)
 
 	var questions = make([]domain.Question, 0)
-	tx := questionDAO.d.db.Where(&domain.Question{UserID: userID}).Find(&questions)
+	tx := questionDAO.d.db.Where(&domain.Question{User: domain.User{Model: gorm.Model{ID: 1}}}).Find(&questions)
 
 	if tx.Error != nil {
 		// log

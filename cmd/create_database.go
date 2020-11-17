@@ -29,6 +29,6 @@ func CreateDatabase() {
 		log.Fatal(openError.Error())
 	}
 
-	sqliteDatabase.AutoMigrate(&domain.User{})
-	sqliteDatabase.AutoMigrate(&domain.Question{})
+	sqliteDatabase.AutoMigrate(&domain.User{}, &domain.Question{})
+	//sqliteDatabase.Model(&domain.Question{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 }

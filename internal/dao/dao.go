@@ -46,7 +46,7 @@ func (d *dao) create(domainStruct interface{}) (interface{}, error) {
 
 	var tx *gorm.DB
 
-	tx = d.db.Create(domainStruct)
+	tx = d.db.Omit("User").Create(domainStruct)
 
 	if tx.Error != nil {
 		// log

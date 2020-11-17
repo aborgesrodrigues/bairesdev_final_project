@@ -9,9 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//"../internal/handler"
-//"../cmd"
-
 func main() {
 	//cmd.CallDao()
 	//cmd.CallService()
