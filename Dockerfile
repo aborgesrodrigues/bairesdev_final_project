@@ -9,10 +9,10 @@ COPY . .
 # Build the outyet command inside the container.
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
-RUN cd server & go install bairesdev_final_project
+RUN cd server && go install .
+
+# Run the outyet command by default when the container starts.
+ENTRYPOINT /go/bin/server
 
 # Document that the service listens on port 8080.
 EXPOSE 8080
-
-# Run the outyet command by default when the container starts.
-ENTRYPOINT /go/bin/bairesdev_final_project
