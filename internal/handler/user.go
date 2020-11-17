@@ -16,14 +16,14 @@ import (
 
 // UserHandler struct
 type UserHandler struct {
-	service service.UserServiceInterface
+	Service service.UserServiceInterface
 	logger  *zap.Logger
 }
 
 // NewUserHandler constructor to QuestionHandler struct
 func NewUserHandler() *UserHandler {
 	logger, _ := zap.NewProduction()
-	return &UserHandler{service: service.NewUserService(logger), logger: logger}
+	return &UserHandler{Service: service.NewUserService(logger), logger: logger}
 }
 
 //CreateUser func
@@ -64,7 +64,7 @@ func (qu *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdUser, error := qu.service.Create(user)
+	createdUser, error := qu.Service.Create(user)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -107,7 +107,7 @@ func (qu *UserHandler) GetOneUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, error := qu.service.FindByID(intUserID)
+	user, error := qu.Service.FindByID(intUserID)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -134,7 +134,7 @@ func (qu *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		zap.String("url", r.URL.Path),
 	)
 
-	users, error := qu.service.GetAll()
+	users, error := qu.Service.GetAll()
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())

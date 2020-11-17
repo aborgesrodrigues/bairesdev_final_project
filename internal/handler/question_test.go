@@ -37,6 +37,7 @@ func TestCreateQuestion(t *testing.T) {
 	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
 	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Create(payload).Return(
 		&domain.Question{
+			Model:     gorm.Model{ID: 1},
 			UserID:    1,
 			Statement: "Statement 1",
 		}, nil)
@@ -53,13 +54,14 @@ func TestCreateQuestion(t *testing.T) {
 	question := domain.Question{}
 	unMarshalErr := json.Unmarshal(resBody, &question)
 
+	//included to facilitate the check with the returned value
+	payload.ID = 1
+
 	assert.NoError(t, marshalError)
 	assert.NoError(t, bodyErr)
 	assert.NoError(t, unMarshalErr)
 	assert.Equal(t, res.StatusCode, http.StatusCreated, "they should be equal")
-	assert.Equal(t, question.Statement, payload.Statement, "they should be equal")
-	assert.Equal(t, question.UserID, payload.UserID, "they should be equal")
-	assert.Equal(t, question.ID, payload.ID, "they should be equal")
+	assert.Equal(t, question, payload, "they should be equal")
 }
 
 func TestFailCreateQuestion(t *testing.T) {
@@ -286,4 +288,106 @@ func TestFailDeleteQuestion(t *testing.T) {
 
 	assert.NoError(t, bodyErr)
 	assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+}
+
+func TestGetAllQuestions(t *testing.T) {
+	allQuestions := make([]domain.Question, 0)
+	allQuestions = append(allQuestions, domain.Question{
+		Model:     gorm.Model{ID: 1},
+		Statement: "statement 1",
+		UserID:    1,
+		User: domain.User{
+			Model:    gorm.Model{ID: 1},
+			Username: "username1",
+			Name:     "User Name 1",
+		},
+	})
+	allQuestions = append(allQuestions, domain.Question{
+		Model:     gorm.Model{ID: 2},
+		Statement: "statement 2",
+		UserID:    2,
+		User: domain.User{
+			Model:    gorm.Model{ID: 2},
+			Username: "username2",
+			Name:     "User Name 2",
+		},
+	})
+
+	handler := handler.NewQuestionHandler()
+	// create the question mock interface
+	ctrl := gomock.NewController(t)
+	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
+	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().GetAll().Return(&allQuestions, nil)
+
+	// create router
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/question", handler.GetAllQuestions).Methods("GET")
+
+	// create request
+	req := httptest.NewRequest("GET", "/question", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+	res := w.Result()
+	defer res.Body.Close()
+	resBody, bodyErr := ioutil.ReadAll(res.Body)
+
+	questions := make([]domain.Question, 0)
+	unMarshalErr := json.Unmarshal(resBody, &questions)
+
+	assert.NoError(t, bodyErr)
+	assert.NoError(t, unMarshalErr)
+	assert.Equal(t, res.StatusCode, http.StatusOK, "they should be equal")
+	assert.Equal(t, allQuestions, questions, "they should be equal")
+}
+
+func TestGetQuestionsByUser(t *testing.T) {
+	allUserQuestions := make([]domain.Question, 0)
+	allUserQuestions = append(allUserQuestions, domain.Question{
+		Model:     gorm.Model{ID: 1},
+		Statement: "statement 1",
+		UserID:    1,
+		User: domain.User{
+			Model:    gorm.Model{ID: 1},
+			Username: "username1",
+			Name:     "User Name 1",
+		},
+	})
+	allUserQuestions = append(allUserQuestions, domain.Question{
+		Model:     gorm.Model{ID: 2},
+		Statement: "statement 2",
+		UserID:    2,
+		User: domain.User{
+			Model:    gorm.Model{ID: 1},
+			Username: "username1",
+			Name:     "User Name 1",
+		},
+	})
+
+	handler := handler.NewQuestionHandler()
+	// create the question mock interface
+	ctrl := gomock.NewController(t)
+	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
+	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().FindByUser(1).Return(&allUserQuestions, nil)
+
+	// create router
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/question/user/{user_id}", handler.GetQuestionsByUser).Methods("GET")
+
+	// create request
+	req := httptest.NewRequest("GET", "/question/user/1", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+	res := w.Result()
+	defer res.Body.Close()
+	resBody, bodyErr := ioutil.ReadAll(res.Body)
+
+	questions := make([]domain.Question, 0)
+	unMarshalErr := json.Unmarshal(resBody, &questions)
+
+	assert.NoError(t, bodyErr)
+	assert.NoError(t, unMarshalErr)
+	assert.Equal(t, res.StatusCode, http.StatusOK, "they should be equal")
+	assert.Equal(t, allUserQuestions, questions, "they should be equal")
 }
