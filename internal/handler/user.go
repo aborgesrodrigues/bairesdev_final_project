@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
-	"final_project/internal/domain"
-	"final_project/internal/service"
+	"bairesdev_final_project/internal/domain"
+	"bairesdev_final_project/internal/service"
 )
 
 // UserHandler struct

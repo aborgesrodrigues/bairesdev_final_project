@@ -3,16 +3,16 @@
 FROM golang:latest
 
 # Copy the local package files to the container's workspace.
-WORKDIR /go/src/final_project
+WORKDIR /go/src/bairesdev_final_project
 COPY . .
 
 # Build the outyet command inside the container.
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
-RUN cd server & go install final_project
+RUN cd server & go install bairesdev_final_project
 
 # Document that the service listens on port 8080.
 EXPOSE 8080
 
 # Run the outyet command by default when the container starts.
-ENTRYPOINT /go/bin/final_project
+ENTRYPOINT /go/bin/bairesdev_final_project

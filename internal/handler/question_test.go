@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"final_project/internal/domain"
+	"bairesdev_final_project/internal/domain"
 
-	"final_project/internal/handler"
+	"bairesdev_final_project/internal/handler"
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"

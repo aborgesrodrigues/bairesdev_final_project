@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"final_project/internal/domain"
+	"bairesdev_final_project/internal/domain"
 
 	"go.uber.org/zap"
 )
