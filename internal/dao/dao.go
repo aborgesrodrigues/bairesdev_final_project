@@ -94,7 +94,7 @@ func (d *dao) delete(domainStruct interface{}, ID int) error {
 
 	var tx *gorm.DB
 
-	d.db.Delete(domainStruct, ID)
+	tx = d.db.Delete(domainStruct, ID)
 
 	if tx.Error != nil {
 		// log
@@ -104,10 +104,11 @@ func (d *dao) delete(domainStruct interface{}, ID int) error {
 		return tx.Error
 	} else if tx.RowsAffected == 0 {
 		// log
-		d.logger.Error(tx.Error.Error(),
+		message := "ID not found"
+		d.logger.Error(message,
 			zap.String("domainStruct", fmt.Sprintf("%#v", domainStruct)),
 		)
-		return errors.New("ID not found")
+		return errors.New(message)
 	}
 
 	return nil

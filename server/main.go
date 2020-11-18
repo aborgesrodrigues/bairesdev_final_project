@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	//cmd.CallDao()
-	//cmd.CallService()
 	//cmd.CreateDatabase()
 	//cmd.PopulateUser()
 
