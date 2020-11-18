@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"bairesdev_final_project/internal/handler"
 
@@ -16,7 +15,7 @@ func main() {
 	//cmd.CreateDatabase()
 	//cmd.PopulateUser()
 
-	os.Setenv("SQLITEPATH", "/home/alessandro/go/src/bairesdev_final_project/server/sqlite-database.db")
+	//os.Setenv("SQLITEPATH", "/home/alessandro/go/src/bairesdev_final_project/server/sqlite-database.db")
 
 	router := mux.NewRouter().StrictSlash(true)
 	handler.CreateUserRouters(router)
