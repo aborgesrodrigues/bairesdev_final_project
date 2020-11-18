@@ -18,7 +18,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 )
 
 // TestCreateQuestion tests the CreateQuestion function of the handler
@@ -37,7 +36,7 @@ func TestCreateQuestion(t *testing.T) {
 	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
 	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Create(payload).Return(
 		&domain.Question{
-			Model:     gorm.Model{ID: 1},
+			ID:        1,
 			UserID:    1,
 			Statement: "Statement 1",
 		}, nil)
@@ -96,7 +95,7 @@ func TestFailCreateQuestion(t *testing.T) {
 func TestUpdateQuestion(t *testing.T) {
 	// Data
 	payload := domain.Question{
-		Model:     gorm.Model{ID: 1},
+		ID:        1,
 		Statement: "Statement 1",
 		UserID:    1,
 	}
@@ -108,7 +107,7 @@ func TestUpdateQuestion(t *testing.T) {
 	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
 	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
 		&domain.Question{
-			Model:     gorm.Model{ID: 1},
+			ID:        1,
 			Statement: "Statement 1",
 			UserID:    1,
 		}, nil)
@@ -139,7 +138,7 @@ func TestUpdateQuestion(t *testing.T) {
 func TestFailUpdateQuestionDifferentID(t *testing.T) {
 	// Data
 	payload := domain.Question{
-		Model:     gorm.Model{ID: 1},
+		ID:        1,
 		Statement: "Statement 1",
 		UserID:    1,
 	}
@@ -174,7 +173,7 @@ func TestFailUpdateQuestionDifferentID(t *testing.T) {
 func TestFailUpdateQuestionIncompleteBody(t *testing.T) {
 	// Data
 	payload := domain.Question{
-		Model:  gorm.Model{ID: 10},
+		ID:     10,
 		UserID: 1,
 	}
 	data, marshalError := json.Marshal(payload)
@@ -208,7 +207,7 @@ func TestFailUpdateQuestionIncompleteBody(t *testing.T) {
 func TestFailUpdateQuestionNotFound(t *testing.T) {
 	// Data
 	payload := domain.Question{
-		Model:     gorm.Model{ID: 10},
+		ID:        10,
 		Statement: "Statement 1",
 		UserID:    1,
 	}
@@ -293,21 +292,21 @@ func TestFailDeleteQuestion(t *testing.T) {
 func TestGetAllQuestions(t *testing.T) {
 	allQuestions := make([]domain.Question, 0)
 	allQuestions = append(allQuestions, domain.Question{
-		Model:     gorm.Model{ID: 1},
+		ID:        1,
 		Statement: "statement 1",
 		UserID:    1,
 		User: domain.User{
-			Model:    gorm.Model{ID: 1},
+			ID:       1,
 			Username: "username1",
 			Name:     "User Name 1",
 		},
 	})
 	allQuestions = append(allQuestions, domain.Question{
-		Model:     gorm.Model{ID: 2},
+		ID:        2,
 		Statement: "statement 2",
 		UserID:    2,
 		User: domain.User{
-			Model:    gorm.Model{ID: 2},
+			ID:       2,
 			Username: "username2",
 			Name:     "User Name 2",
 		},
@@ -344,21 +343,21 @@ func TestGetAllQuestions(t *testing.T) {
 func TestGetQuestionsByUser(t *testing.T) {
 	allUserQuestions := make([]domain.Question, 0)
 	allUserQuestions = append(allUserQuestions, domain.Question{
-		Model:     gorm.Model{ID: 1},
+		ID:        1,
 		Statement: "statement 1",
 		UserID:    1,
 		User: domain.User{
-			Model:    gorm.Model{ID: 1},
+			ID:       1,
 			Username: "username1",
 			Name:     "User Name 1",
 		},
 	})
 	allUserQuestions = append(allUserQuestions, domain.Question{
-		Model:     gorm.Model{ID: 2},
+		ID:        2,
 		Statement: "statement 2",
 		UserID:    2,
 		User: domain.User{
-			Model:    gorm.Model{ID: 1},
+			ID:       2,
 			Username: "username1",
 			Name:     "User Name 1",
 		},

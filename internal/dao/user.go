@@ -19,9 +19,9 @@ type UserDAO struct {
 
 //UserDAOInterface interface
 type UserDAOInterface interface {
-	Create(*domain.User) (*domain.User, error)
+	Create(domain.User) (*domain.User, error)
 	FindByID(int) (*domain.User, error)
-	GetAll() ([]domain.User, error)
+	GetAll() (*[]domain.User, error)
 }
 
 // NewUserDAO Constructor of UserDAO struct
@@ -30,13 +30,13 @@ func NewUserDAO(logger *zap.Logger) *UserDAO {
 }
 
 // Create func
-func (userDAO UserDAO) Create(user *domain.User) (*domain.User, error) {
+func (userDAO UserDAO) Create(user domain.User) (*domain.User, error) {
 	// Entry log
 	userDAO.logger.Info("Called Create",
 		zap.String("user", fmt.Sprintf("%#v", user)),
 	)
 
-	createdUser, err := userDAO.d.create(user)
+	createdUser, err := userDAO.d.create(&user)
 
 	if err != nil {
 		// Entry log
@@ -72,7 +72,7 @@ func (userDAO UserDAO) FindByID(ID int) (*domain.User, error) {
 }
 
 // GetAll func
-func (userDAO UserDAO) GetAll() ([]domain.User, error) {
+func (userDAO UserDAO) GetAll() (*[]domain.User, error) {
 	// Entry log
 	userDAO.logger.Info("Called GetAll")
 
@@ -85,5 +85,5 @@ func (userDAO UserDAO) GetAll() ([]domain.User, error) {
 		return nil, err
 	}
 
-	return users.([]domain.User), nil
+	return users.(*[]domain.User), nil
 }

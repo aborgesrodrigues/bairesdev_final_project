@@ -34,7 +34,7 @@ func (m *MockQuestionDAOInterface) EXPECT() *MockQuestionDAOInterfaceMockRecorde
 }
 
 // Create mocks base method
-func (m *MockQuestionDAOInterface) Create(arg0 *domain.Question) (*domain.Question, error) {
+func (m *MockQuestionDAOInterface) Create(arg0 domain.Question) (*domain.Question, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0)
 	ret0, _ := ret[0].(*domain.Question)
@@ -49,7 +49,7 @@ func (mr *MockQuestionDAOInterfaceMockRecorder) Create(arg0 interface{}) *gomock
 }
 
 // Update mocks base method
-func (m *MockQuestionDAOInterface) Update(arg0 *domain.Question) (*domain.Question, error) {
+func (m *MockQuestionDAOInterface) Update(arg0 domain.Question) (*domain.Question, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0)
 	ret0, _ := ret[0].(*domain.Question)

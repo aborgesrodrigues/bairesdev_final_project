@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"time"
 
 	"bairesdev_final_project/internal/dao"
 	"bairesdev_final_project/internal/domain"
@@ -14,7 +13,7 @@ import (
 
 // QuestionService struct
 type QuestionService struct {
-	dao    dao.QuestionDAOInterface
+	Dao    dao.QuestionDAOInterface
 	logger *zap.Logger
 }
 
@@ -32,7 +31,7 @@ type QuestionServiceInterface interface {
 
 // NewQuestionService constructor of QuestionService struct
 func NewQuestionService(logger *zap.Logger) *QuestionService {
-	return &QuestionService{dao: dao.NewQuestionDAO(logger), logger: logger}
+	return &QuestionService{Dao: dao.NewQuestionDAO(logger), logger: logger}
 }
 
 // Check if all attributes are filled
@@ -66,10 +65,10 @@ func (srv QuestionService) Create(question domain.Question) (*domain.Question, e
 		srv.logger.Info(message,
 			zap.String("question", fmt.Sprintf("%#v", question)),
 		)
-		return &domain.Question{}, errors.New(message)
+		return nil, errors.New(message)
 	}
 
-	return srv.dao.Create(&question)
+	return srv.Dao.Create(question)
 }
 
 // Update func
@@ -86,12 +85,10 @@ func (srv QuestionService) Update(question domain.Question) (*domain.Question, e
 			zap.String("question", fmt.Sprintf("%#v", question)),
 		)
 
-		return &domain.Question{}, errors.New(message)
+		return nil, errors.New(message)
 	}
 
-	question.UpdatedAt = time.Now()
-
-	return srv.dao.Update(&question)
+	return srv.Dao.Update(question)
 }
 
 // Delete func
@@ -101,7 +98,7 @@ func (srv QuestionService) Delete(ID int) error {
 		zap.String("ID", strconv.Itoa(ID)),
 	)
 
-	return srv.dao.Delete(ID)
+	return srv.Dao.Delete(ID)
 }
 
 // FindByID func
@@ -111,7 +108,7 @@ func (srv QuestionService) FindByID(ID int) (*domain.Question, error) {
 		zap.String("ID", strconv.Itoa(ID)),
 	)
 
-	return srv.dao.FindByID(ID)
+	return srv.Dao.FindByID(ID)
 }
 
 // FindByUser func
@@ -121,7 +118,7 @@ func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) {
 		zap.String("userID", strconv.Itoa(userID)),
 	)
 
-	return srv.dao.FindByUser(userID)
+	return srv.Dao.FindByUser(userID)
 }
 
 // GetAll func
@@ -129,5 +126,5 @@ func (srv QuestionService) GetAll() (*[]domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called GetAll")
 
-	return srv.dao.GetAll()
+	return srv.Dao.GetAll()
 }

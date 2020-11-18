@@ -34,7 +34,7 @@ func (m *MockUserDAOInterface) EXPECT() *MockUserDAOInterfaceMockRecorder {
 }
 
 // Create mocks base method
-func (m *MockUserDAOInterface) Create(arg0 *domain.User) (*domain.User, error) {
+func (m *MockUserDAOInterface) Create(arg0 domain.User) (*domain.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0)
 	ret0, _ := ret[0].(*domain.User)
@@ -64,10 +64,10 @@ func (mr *MockUserDAOInterfaceMockRecorder) FindByID(arg0 interface{}) *gomock.C
 }
 
 // GetAll mocks base method
-func (m *MockUserDAOInterface) GetAll() ([]domain.User, error) {
+func (m *MockUserDAOInterface) GetAll() (*[]domain.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]domain.User)
+	ret0, _ := ret[0].(*[]domain.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -15,14 +15,13 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 )
 
 func TestCreateUser(t *testing.T) {
 	birthday, _ := time.Parse("2006-01-02", "1983-01-29")
 	// Data
 	payload := domain.User{
-		Model:    gorm.Model{ID: 1},
+		ID:       1,
 		Username: "user1",
 		Name:     "user name",
 		Birthday: birthday,
@@ -36,7 +35,7 @@ func TestCreateUser(t *testing.T) {
 	handler.Service = service.NewMockUserServiceInterface(ctrl)
 	handler.Service.(*service.MockUserServiceInterface).EXPECT().Create(payload).Return(
 		&domain.User{
-			Model:    gorm.Model{ID: 1},
+			ID:       1,
 			Username: "user1",
 			Name:     "user name",
 			Birthday: birthday,
@@ -67,12 +66,12 @@ func TestCreateUser(t *testing.T) {
 func TestGetAllUsers(t *testing.T) {
 	allUsers := make([]domain.User, 0)
 	allUsers = append(allUsers, domain.User{
-		Model:    gorm.Model{ID: 1},
+		ID:       1,
 		Username: "username1",
 		Name:     "User Name 1",
 	})
 	allUsers = append(allUsers, domain.User{
-		Model:    gorm.Model{ID: 2},
+		ID:       2,
 		Username: "username2",
 		Name:     "User Name 2",
 	})
@@ -81,7 +80,7 @@ func TestGetAllUsers(t *testing.T) {
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	handler.Service = service.NewMockUserServiceInterface(ctrl)
-	handler.Service.(*service.MockUserServiceInterface).EXPECT().GetAll().Return(allUsers, nil)
+	handler.Service.(*service.MockUserServiceInterface).EXPECT().GetAll().Return(&allUsers, nil)
 
 	// create router
 	router := mux.NewRouter().StrictSlash(true)
@@ -108,7 +107,7 @@ func TestGetAllUsers(t *testing.T) {
 func TestFindByID(t *testing.T) {
 
 	foundUser := domain.User{
-		Model:    gorm.Model{ID: 1},
+		ID:       1,
 		Username: "username1",
 		Name:     "User Name 1",
 	}

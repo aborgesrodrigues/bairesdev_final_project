@@ -12,7 +12,7 @@ import (
 
 // UserService struct
 type UserService struct {
-	dao    dao.UserDAOInterface
+	Dao    dao.UserDAOInterface
 	logger *zap.Logger
 }
 
@@ -22,12 +22,12 @@ type UserService struct {
 type UserServiceInterface interface {
 	Create(domain.User) (*domain.User, error)
 	FindByID(int) (*domain.User, error)
-	GetAll() ([]domain.User, error)
+	GetAll() (*[]domain.User, error)
 }
 
 // NewUserService constructor of UserService struct
 func NewUserService(logger *zap.Logger) *UserService {
-	return &UserService{dao: dao.NewUserDAO(logger), logger: logger}
+	return &UserService{Dao: dao.NewUserDAO(logger), logger: logger}
 }
 
 // FindByID func
@@ -37,7 +37,7 @@ func (srv UserService) FindByID(ID int) (*domain.User, error) {
 		zap.String("ID", strconv.Itoa(ID)),
 	)
 
-	return srv.dao.FindByID(ID)
+	return srv.Dao.FindByID(ID)
 }
 
 // Create func
@@ -47,13 +47,13 @@ func (srv UserService) Create(user domain.User) (*domain.User, error) {
 		zap.String("user", fmt.Sprintf("%#v", user)),
 	)
 
-	return srv.dao.Create(&user)
+	return srv.Dao.Create(user)
 }
 
 // GetAll func
-func (srv UserService) GetAll() ([]domain.User, error) {
+func (srv UserService) GetAll() (*[]domain.User, error) {
 	// Entry log
 	srv.logger.Info("Called GetAll")
 
-	return srv.dao.GetAll()
+	return srv.Dao.GetAll()
 }

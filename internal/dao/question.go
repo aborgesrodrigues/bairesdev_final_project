@@ -7,7 +7,6 @@ import (
 	"bairesdev_final_project/internal/domain"
 
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 // QuestionDAO struct
@@ -20,8 +19,8 @@ type QuestionDAO struct {
 
 //QuestionDAOInterface interface
 type QuestionDAOInterface interface {
-	Create(*domain.Question) (*domain.Question, error)
-	Update(*domain.Question) (*domain.Question, error)
+	Create(domain.Question) (*domain.Question, error)
+	Update(domain.Question) (*domain.Question, error)
 	Delete(int) error
 	FindByID(int) (*domain.Question, error)
 	FindByUser(int) (*[]domain.Question, error)
@@ -34,13 +33,13 @@ func NewQuestionDAO(logger *zap.Logger) *QuestionDAO {
 }
 
 // Create func
-func (questionDAO QuestionDAO) Create(question *domain.Question) (*domain.Question, error) {
+func (questionDAO QuestionDAO) Create(question domain.Question) (*domain.Question, error) {
 	// Entry log
 	questionDAO.logger.Info("Called Create",
 		zap.String("question", fmt.Sprintf("%#v", question)),
 	)
 
-	createdQuestion, err := questionDAO.d.create(question)
+	createdQuestion, err := questionDAO.d.create(&question)
 
 	if err != nil {
 		// log
@@ -48,20 +47,20 @@ func (questionDAO QuestionDAO) Create(question *domain.Question) (*domain.Questi
 			zap.String("question", fmt.Sprintf("%#v", question)),
 		)
 
-		return createdQuestion.(*domain.Question), err
+		return nil, err
 	}
 
 	return createdQuestion.(*domain.Question), nil
 }
 
 // Update func
-func (questionDAO QuestionDAO) Update(question *domain.Question) (*domain.Question, error) {
+func (questionDAO QuestionDAO) Update(question domain.Question) (*domain.Question, error) {
 	// Entry log
 	questionDAO.logger.Info("Called Update",
 		zap.String("question", fmt.Sprintf("%#v", question)),
 	)
 
-	updatedQuestion, err := questionDAO.d.update(question)
+	updatedQuestion, err := questionDAO.d.update(&question)
 
 	if err != nil {
 		// log
@@ -69,7 +68,7 @@ func (questionDAO QuestionDAO) Update(question *domain.Question) (*domain.Questi
 			zap.String("question", fmt.Sprintf("%#v", question)),
 		)
 
-		return updatedQuestion.(*domain.Question), err
+		return nil, err
 	}
 
 	return updatedQuestion.(*domain.Question), nil
@@ -111,7 +110,7 @@ func (questionDAO QuestionDAO) FindByID(ID int) (*domain.Question, error) {
 			zap.String("question", fmt.Sprintf("%#v", question)),
 		)
 
-		return question.(*domain.Question), err
+		return nil, err
 	}
 
 	return question.(*domain.Question), nil
@@ -125,7 +124,7 @@ func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error
 	)
 
 	var questions = make([]domain.Question, 0)
-	tx := questionDAO.d.db.Where(&domain.Question{User: domain.User{Model: gorm.Model{ID: 1}}}).Find(&questions)
+	tx := questionDAO.d.db.Where(&domain.Question{User: domain.User{ID: 1}}).Find(&questions)
 
 	if tx.Error != nil {
 		// log

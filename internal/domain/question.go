@@ -1,10 +1,8 @@
 package domain
 
-import "gorm.io/gorm"
-
 // Question struct
 type Question struct {
-	gorm.Model
+	ID        uint   `gorm:"primarykey"`
 	Statement string `gorm:"not null" json:"statement"`
 	Answer    string `json:"answer"`
 	UserID    uint   `gorm:"not null" json:"user_id,omitempty"`

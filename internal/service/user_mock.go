@@ -64,10 +64,10 @@ func (mr *MockUserServiceInterfaceMockRecorder) FindByID(arg0 interface{}) *gomo
 }
 
 // GetAll mocks base method
-func (m *MockUserServiceInterface) GetAll() ([]domain.User, error) {
+func (m *MockUserServiceInterface) GetAll() (*[]domain.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]domain.User)
+	ret0, _ := ret[0].(*[]domain.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
