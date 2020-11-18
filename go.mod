@@ -12,4 +12,5 @@ require (
 	golang.org/x/tools v0.0.0-20201117152513-9036a0f9af11 // indirect
 	gorm.io/driver/sqlite v1.1.3
 	gorm.io/gorm v1.20.6
+	rsc.io/quote/v3 v3.1.0 // indirect
 )
