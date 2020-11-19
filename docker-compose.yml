@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8080:8080"
+    environment:
+      - SQLITEPATH=/go/src/bairesdev_final_project/server/sqlite-database.db
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    ports:
+      - "8088"
