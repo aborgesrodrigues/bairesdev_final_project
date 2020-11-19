@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"go.uber.org/zap"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -23,14 +23,21 @@ func newDAO(logger *zap.Logger) *dao {
 }
 
 func (d *dao) setConnection() {
-	var sqlitePath = os.Getenv("SQLITEPATH")
+	var host = os.Getenv("DATABASE_HOST")
+	var user = os.Getenv("DATABASE_USER")
+	var password = os.Getenv("DATABASE_PASSWORD")
+	var dbName = os.Getenv("DATABASE_NAME")
+
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbName, password)
+
 	// Entry log
 	d.logger.Info("Called setConnection",
-		zap.String("path_database", sqlitePath),
+		zap.String("dsn", dsn),
 	)
 
 	var err error
-	d.db, err = gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	d.db = db
 
 	if err != nil {
 		// log

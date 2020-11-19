@@ -1,34 +1,26 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"bairesdev_final_project/internal/domain"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 // CreateDatabase func
 func CreateDatabase() {
-	var sqlitePash = os.Getenv("SQLITEPATH") + "sqlite-database.db"
+	var host = os.Getenv("DATABASE_HOST")
+	var user = os.Getenv("DATABASE_USER")
+	var password = os.Getenv("DATABASE_PASSWORD")
+	var dbName = os.Getenv("DATABASE_NAME")
 
-	os.Remove(sqlitePash)
+	dsnPostgres := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbName, password)
 
-	file, err := os.Create(sqlitePash) // Create SQLite file
-	if err != nil {
-		log.Fatal(err.Error())
-		return
-	}
-	file.Close()
+	db, _ := gorm.Open(postgres.Open(dsnPostgres), &gorm.Config{})
 
-	sqliteDatabase, openError := gorm.Open(sqlite.Open(sqlitePash), &gorm.Config{})
-
-	if openError != nil {
-		log.Fatal(openError.Error())
-	}
-
-	sqliteDatabase.AutoMigrate(&domain.User{}, &domain.Question{})
+	db.AutoMigrate(&domain.User{}, &domain.Question{})
 	//sqliteDatabase.Model(&domain.Question{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 }
