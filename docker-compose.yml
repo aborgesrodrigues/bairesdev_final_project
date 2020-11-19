@@ -1,11 +1,14 @@
 version: "3.8"
 services:
   db:
-    build:
-      context: .
-      dockerfile: Dockerfile.db
-    volumes:
-      - sqlite_db:/root
+    restart: always
+    image: postgres
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=postgres
+    ports:
+      - "54321:54321"
   api:
     build: 
       context: .
@@ -13,11 +16,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SQLITEPATH=/root/sqlite-database.db
-    volumes_from: 
-      - db
+      - DATABASE_HOST=0.0.0.0
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=123456
+      - DATABASE_NAME=postgres
+      - DATABASE_PORT=54321
     depends_on:
       - db
-volumes:
-  sqlite_db:
-    external: false
