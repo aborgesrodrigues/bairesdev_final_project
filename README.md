@@ -20,7 +20,7 @@ $ docker-compose up
 ## Tests
 With the service running it is possible to call the apis.
 
-Create a question
+**Create a question**
 ```
 curl --header "Content-Type: application/json" \
   --request POST \
@@ -38,7 +38,7 @@ Expected return
 }
 ```
 
-Update a question
+**Update a question**
 ```
 curl --header "Content-Type: application/json" \
   --request PUT \
@@ -56,7 +56,7 @@ Expected return
 }
 ```
 
-Delete a question
+**Delete a question**
 ```
 curl --request DELETE http://localhost:8080/question/1
 ```
@@ -66,7 +66,7 @@ Expected return
 "File deleted"
 ```
 
-Get all questions
+**Get all questions**
 ```
 curl --request GET http://localhost:8080/question
 ```
@@ -89,7 +89,7 @@ Expected return
 ]
 ```
 
-Get all questions by user
+**Get all questions by user**
 ```
 curl --request GET http://localhost:8080/question/user/1
 ```
