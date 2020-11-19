@@ -124,7 +124,7 @@ func (questionDAO QuestionDAO) FindByUser(userID int) (*[]domain.Question, error
 	)
 
 	var questions = make([]domain.Question, 0)
-	tx := questionDAO.d.db.Where(&domain.Question{User: domain.User{ID: 1}}).Find(&questions)
+	tx := questionDAO.d.db.Where(&domain.Question{UserID: uint(userID)}).Find(&questions)
 
 	if tx.Error != nil {
 		// log

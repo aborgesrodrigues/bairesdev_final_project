@@ -4,7 +4,7 @@ package domain
 type Question struct {
 	ID        uint   `gorm:"primarykey"`
 	Statement string `gorm:"not null" json:"statement"`
-	Answer    string `json:"answer"`
+	Answer    string `json:"answer,omitempty"`
 	UserID    uint   `gorm:"not null" json:"user_id,omitempty"`
-	User      User   `gorm:"constraint:OnUpdate:RESTRICT,OnDelete:RESTRICT" json:"user"`
+	User      User   `gorm:"constraint:OnUpdate:RESTRICT,OnDelete:RESTRICT" json:"-"`
 }
