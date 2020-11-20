@@ -1,8 +1,0 @@
-# Start from a Debian image with the latest version of Go installed
-# and a workspace (GOPATH) configured at /go.
-FROM postgres:latest
-
-COPY ./docker_postgres_init.sql /docker-entrypoint-initdb.d/docker_postgres_init.sql
-
-RUN ls /docker-entrypoint-initdb.d/
-RUN cat /docker-entrypoint-initdb.d/docker_postgres_init.sql
