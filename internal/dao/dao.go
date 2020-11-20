@@ -29,7 +29,7 @@ func (d *dao) setConnection() {
 	var dbName = os.Getenv("DATABASE_NAME")
 	var port = os.Getenv("DATABASE_PORT")
 
-	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", host, user, dbName, password, port)
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s", host, user, dbName, password, port)
 
 	// Entry log
 	d.logger.Info("Called setConnection",

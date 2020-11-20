@@ -4,11 +4,13 @@ services:
     restart: always
     image: postgres
     environment: 
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB=postgres
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
     ports:
       - "54321:5432"
+    volumes:
+        - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
   api:
     build: 
       context: .
@@ -16,10 +18,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_HOST=172.18.0.1 
-      - DATABASE_USER=postgres 
-      - DATABASE_PASSWORD=123456 
-      - DATABASE_NAME=postgres 
+      - DATABASE_HOST=172.17.0.1
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=root
       - DATABASE_PORT=54321
     depends_on:
       - db

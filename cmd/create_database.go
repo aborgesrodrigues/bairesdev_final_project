@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -11,14 +11,14 @@ import (
 )
 
 // CreateDatabase func
-func CreateDatabase() {
+func main() {
 	var host = os.Getenv("DATABASE_HOST")
 	var user = os.Getenv("DATABASE_USER")
 	var password = os.Getenv("DATABASE_PASSWORD")
 	var dbName = os.Getenv("DATABASE_NAME")
 	var port = os.Getenv("DATABASE_PORT")
 
-	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", host, user, dbName, password, port)
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s", host, user, dbName, password, port)
 
 	db, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
