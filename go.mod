@@ -5,7 +5,6 @@ go 1.15
 require (
 	github.com/golang/mock v1.4.4
 	github.com/gorilla/mux v1.8.0
-	github.com/jackc/pgx v3.6.2+incompatible // indirect
 	github.com/mattn/go-sqlite3 v1.14.5 // indirect
 	github.com/stretchr/testify v1.6.1
 	go.uber.org/multierr v1.6.0 // indirect
@@ -14,5 +13,4 @@ require (
 	gorm.io/driver/postgres v1.0.5
 	gorm.io/driver/sqlite v1.1.3
 	gorm.io/gorm v1.20.6
-	rsc.io/quote/v3 v3.1.0 // indirect
 )
