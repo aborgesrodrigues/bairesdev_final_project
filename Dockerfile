@@ -11,11 +11,13 @@ RUN go mod download
 
 COPY . .
 
+# Run the tests
+RUN go test ./...
+
 # Build the outyet command inside the container.
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
 RUN cd server && CGO_ENABLED=0 GOOS=linux go install -a -installsuffix .
-#RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 ######## Start a new stage from scratch #######
 FROM alpine:latest  

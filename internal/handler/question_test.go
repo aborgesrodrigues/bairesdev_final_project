@@ -340,7 +340,7 @@ func TestGetQuestionsByUser(t *testing.T) {
 	allUserQuestions = append(allUserQuestions, domain.Question{
 		ID:        2,
 		Statement: "statement 2",
-		UserID:    2,
+		UserID:    1,
 	})
 
 	handler := handler.NewQuestionHandler()
