@@ -1,0 +1,762 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handler: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">bairesdev_final_project/internal/handler/question.go (62.5%)</option>
+				
+				<option value="file1">bairesdev_final_project/internal/handler/user.go (51.0%)</option>
+				
+				<option value="file2">bairesdev_final_project/internal/service/question.go (100.0%)</option>
+				
+				<option value="file3">bairesdev_final_project/internal/service/user.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "fmt"
+        "io/ioutil"
+        "net/http"
+        "strconv"
+
+        "bairesdev_final_project/internal/domain"
+        "bairesdev_final_project/internal/service"
+
+        "github.com/gorilla/mux"
+        "go.uber.org/zap"
+)
+
+// QuestionHandler struct
+type QuestionHandler struct {
+        Service service.QuestionServiceInterface
+        logger  *zap.Logger
+}
+
+// NewQuestionHandler constructor to QuestionHandler struct
+func NewQuestionHandler() *QuestionHandler <span class="cov8" title="1">{
+        logger, _ := zap.NewProduction()
+        return &amp;QuestionHandler{Service: service.NewQuestionService(logger), logger: logger}
+}</span>
+
+//CreateQuestion creates a new question
+func (qh *QuestionHandler) CreateQuestion(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qh.logger.Sync()
+
+        var question domain.Question
+        reqBody, err := ioutil.ReadAll(r.Body)
+
+        // Entry log
+        qh.logger.Info("Fetched CreateQuestion",
+                zap.String("url", r.URL.Path),
+                zap.String("body", string(reqBody)),
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, "Kindly enter data with the Product title and description only in order to update")
+
+                //log
+                qh.logger.Error(err.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+        <span class="cov8" title="1">err = json.Unmarshal(reqBody, &amp;question)
+        if err != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, err.Error())
+
+                //log
+                qh.logger.Error(err.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">createdQuestion, error := qh.Service.Create(question)
+
+        if error != nil </span><span class="cov8" title="1">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qh.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">w.WriteHeader(http.StatusCreated)
+        json.NewEncoder(w).Encode(createdQuestion)</span>
+}
+
+//UpdateQuestion updates existing question
+func (qh *QuestionHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qh.logger.Sync()
+
+        var question domain.Question
+
+        // read the body of the request
+        reqBody, err := ioutil.ReadAll(r.Body)
+
+        // Entry log
+        qh.logger.Info("Fetched UpdateQuestion",
+                zap.String("url", r.URL.Path),
+                zap.String("body", string(reqBody)),
+                zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                message := "Invalid data"
+
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, message)
+
+                //log
+                qh.logger.Error(err.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        // get the parameter
+        <span class="cov8" title="1">ID := mux.Vars(r)["id"]
+        intID, intError := strconv.Atoi(ID)
+
+        if intError != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, intError.Error())
+
+                //log
+                qh.logger.Error(intError.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        // convert json value to question struct
+        <span class="cov8" title="1">err = json.Unmarshal(reqBody, &amp;question)
+        if err != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, err.Error())
+
+                //log
+                qh.logger.Error(err.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">if int(question.ID) != intID </span><span class="cov8" title="1">{
+                message := "ID of the question is different of the parameter"
+
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, "ID of the question is different of the parameter")
+
+                //log
+                qh.logger.Error(message,
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        // call the service to update the question
+        <span class="cov8" title="1">updatedQuestion, error := qh.Service.Update(question)
+
+        if error != nil </span><span class="cov8" title="1">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qh.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewEncoder(w).Encode(updatedQuestion)</span>
+}
+
+//DeleteQuestion deletes a question
+func (qh *QuestionHandler) DeleteQuestion(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qh.logger.Sync()
+
+        // Entry log
+        qh.logger.Info("Fetched DeleteQuestion",
+                zap.String("url", r.URL.Path),
+                zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+        )
+
+        // get the parameter
+        ID := mux.Vars(r)["id"]
+        intID, intError := strconv.Atoi(ID)
+
+        if intError != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, intError.Error())
+                return
+        }</span>
+
+        // call the service to update the question
+        <span class="cov8" title="1">error := qh.Service.Delete(intID)
+
+        if error != nil </span><span class="cov8" title="1">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qh.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewEncoder(w).Encode("Question deleted")</span>
+}
+
+// GetAllQuestions return all existing questions
+func (qh *QuestionHandler) GetAllQuestions(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qh.logger.Sync()
+
+        // Entry log
+        qh.logger.Info("Fetched GetAllQuestions",
+                zap.String("url", r.URL.Path),
+        )
+
+        questions, error := qh.Service.GetAll()
+
+        if error != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qh.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewEncoder(w).Encode(questions)</span>
+}
+
+// GetQuestionsByUser returns all the questions of an user
+func (qh *QuestionHandler) GetQuestionsByUser(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qh.logger.Sync()
+
+        // Entry log
+        qh.logger.Info("Fetched GetQuestionsByUser",
+                zap.String("url", r.URL.Path),
+                zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+        )
+
+        // get the user_id var
+        userID := mux.Vars(r)["user_id"]
+        intUserID, intError := strconv.Atoi(userID)
+
+        if intError != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, intError.Error())
+
+                //log
+                qh.logger.Error(intError.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        // call the service to find question by user
+        <span class="cov8" title="1">questions, error := qh.Service.FindByUser(intUserID)
+
+        if error != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qh.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewEncoder(w).Encode(questions)</span>
+}
+
+// CreateQuestionRouters func
+func CreateQuestionRouters(router *mux.Router) <span class="cov0" title="0">{
+        qh := NewQuestionHandler()
+        router.HandleFunc("/question", qh.CreateQuestion).Methods("POST")
+        router.HandleFunc("/question", qh.GetAllQuestions).Methods("GET")
+        router.HandleFunc("/question/user/{user_id}", qh.GetQuestionsByUser).Methods("GET")
+        router.HandleFunc("/question/{id}", qh.UpdateQuestion).Methods("PUT")
+        router.HandleFunc("/question/{id}", qh.DeleteQuestion).Methods("DELETE")
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "fmt"
+        "io/ioutil"
+        "net/http"
+        "strconv"
+
+        "github.com/gorilla/mux"
+        "go.uber.org/zap"
+
+        "bairesdev_final_project/internal/domain"
+        "bairesdev_final_project/internal/service"
+)
+
+// UserHandler struct
+type UserHandler struct {
+        Service service.UserServiceInterface
+        logger  *zap.Logger
+}
+
+// NewUserHandler constructor to QuestionHandler struct
+func NewUserHandler() *UserHandler <span class="cov8" title="1">{
+        logger, _ := zap.NewProduction()
+        return &amp;UserHandler{Service: service.NewUserService(logger), logger: logger}
+}</span>
+
+//CreateUser func
+func (qu *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qu.logger.Sync()
+
+        var user domain.User
+        reqBody, err := ioutil.ReadAll(r.Body)
+
+        // Entry log
+        qu.logger.Info("Fetched CreateUser",
+                zap.String("url", r.URL.Path),
+                zap.String("body", string(reqBody)),
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, "Kindly enter data with the Product title and description only in order to update")
+
+                //log
+                qu.logger.Error(err.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+        <span class="cov8" title="1">err = json.Unmarshal(reqBody, &amp;user)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, err.Error())
+                w.WriteHeader(http.StatusBadRequest)
+
+                //log
+                qu.logger.Error(err.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">createdUser, error := qu.Service.Create(user)
+
+        if error != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qu.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("body", string(reqBody)),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">w.WriteHeader(http.StatusCreated)
+        json.NewEncoder(w).Encode(createdUser)</span>
+}
+
+// GetOneUser func
+func (qu *UserHandler) GetOneUser(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qu.logger.Sync()
+
+        // Entry log
+        qu.logger.Info("Fetched GetQuestionsByUser",
+                zap.String("url", r.URL.Path),
+                zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+        )
+
+        userID := mux.Vars(r)["id"]
+        intUserID, intError := strconv.Atoi(userID)
+
+        if intError != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprintf(w, "Invalid number")
+
+                //log
+                qu.logger.Error(intError.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">user, error := qu.Service.FindByID(intUserID)
+
+        if error != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qu.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewEncoder(w).Encode(user)</span>
+
+}
+
+// GetAllUsers func
+func (qu *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // log
+        defer qu.logger.Sync()
+
+        // Entry log
+        qu.logger.Info("Fetched GetQuestionsByUser",
+                zap.String("url", r.URL.Path),
+        )
+
+        users, error := qu.Service.GetAll()
+
+        if error != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(w, error.Error())
+
+                //log
+                qu.logger.Error(error.Error(),
+                        zap.String("url", r.URL.Path),
+                        zap.String("variables", fmt.Sprintf("%#v", mux.Vars(r))),
+                )
+                return
+        }</span>
+
+        <span class="cov8" title="1">json.NewEncoder(w).Encode(users)</span>
+}
+
+// CreateUserRouters func
+func CreateUserRouters(router *mux.Router) <span class="cov0" title="0">{
+        qu := NewUserHandler()
+
+        router.HandleFunc("/user", qu.CreateUser).Methods("POST")
+        router.HandleFunc("/user", qu.GetAllUsers).Methods("GET")
+        router.HandleFunc("/user/{id}", qu.GetOneUser).Methods("GET")
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package service
+
+import (
+        "errors"
+        "fmt"
+        "strconv"
+
+        "bairesdev_final_project/internal/dao"
+        "bairesdev_final_project/internal/domain"
+
+        "go.uber.org/zap"
+)
+
+// QuestionService struct
+type QuestionService struct {
+        Dao    dao.QuestionDAOInterface
+        logger *zap.Logger
+}
+
+//go:generate mockgen -source=question.go -destination=question_mock.go -package=service
+
+//QuestionServiceInterface interface
+type QuestionServiceInterface interface {
+        Create(domain.Question) (*domain.Question, error)
+        Update(domain.Question) (*domain.Question, error)
+        Delete(int) error
+        FindByID(int) (*domain.Question, error)
+        FindByUser(int) (*[]domain.Question, error)
+        GetAll() (*[]domain.Question, error)
+}
+
+// NewQuestionService constructor of QuestionService struct
+func NewQuestionService(logger *zap.Logger) *QuestionService <span class="cov8" title="1">{
+        return &amp;QuestionService{Dao: dao.NewQuestionDAO(logger), logger: logger}
+}</span>
+
+// Check if all attributes are filled
+func (srv QuestionService) checkStruct(question domain.Question, checkID bool) bool <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called checkStruct",
+                zap.String("question", fmt.Sprintf("%#v", question)),
+                zap.String("checkID", strconv.FormatBool(checkID)),
+        )
+
+        if (question.ID == 0 &amp;&amp; checkID) ||
+                question.Statement == "" ||
+                question.UserID == 0 </span><span class="cov8" title="1">{
+
+                return false
+        }</span>
+
+        <span class="cov8" title="1">return true</span>
+}
+
+// Create func
+func (srv QuestionService) Create(question domain.Question) (*domain.Question, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called Create",
+                zap.String("question", fmt.Sprintf("%#v", question)),
+        )
+
+        if !srv.checkStruct(question, false) </span><span class="cov8" title="1">{
+                //log
+                message := "Not all attributes are filled"
+                srv.logger.Info(message,
+                        zap.String("question", fmt.Sprintf("%#v", question)),
+                )
+                return nil, errors.New(message)
+        }</span>
+
+        <span class="cov8" title="1">return srv.Dao.Create(question)</span>
+}
+
+// Update func
+func (srv QuestionService) Update(question domain.Question) (*domain.Question, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called Update",
+                zap.String("question", fmt.Sprintf("%#v", question)),
+        )
+
+        if !srv.checkStruct(question, true) </span><span class="cov8" title="1">{
+                //log
+                message := "Not all attributes are filled"
+                srv.logger.Info(message,
+                        zap.String("question", fmt.Sprintf("%#v", question)),
+                )
+
+                return nil, errors.New(message)
+        }</span>
+
+        <span class="cov8" title="1">return srv.Dao.Update(question)</span>
+}
+
+// Delete func
+func (srv QuestionService) Delete(ID int) error <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called Delete",
+                zap.String("ID", strconv.Itoa(ID)),
+        )
+
+        return srv.Dao.Delete(ID)
+}</span>
+
+// FindByID func
+func (srv QuestionService) FindByID(ID int) (*domain.Question, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called FindByID",
+                zap.String("ID", strconv.Itoa(ID)),
+        )
+
+        return srv.Dao.FindByID(ID)
+}</span>
+
+// FindByUser func
+func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called FindByUser",
+                zap.String("userID", strconv.Itoa(userID)),
+        )
+
+        return srv.Dao.FindByUser(userID)
+}</span>
+
+// GetAll func
+func (srv QuestionService) GetAll() (*[]domain.Question, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called GetAll")
+
+        return srv.Dao.GetAll()
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package service
+
+import (
+        "fmt"
+        "strconv"
+
+        "bairesdev_final_project/internal/dao"
+        "bairesdev_final_project/internal/domain"
+
+        "go.uber.org/zap"
+)
+
+// UserService struct
+type UserService struct {
+        Dao    dao.UserDAOInterface
+        logger *zap.Logger
+}
+
+//go:generate mockgen -source=user.go -destination=user_mock.go -package=service
+
+//UserServiceInterface interface
+type UserServiceInterface interface {
+        Create(domain.User) (*domain.User, error)
+        FindByID(int) (*domain.User, error)
+        GetAll() (*[]domain.User, error)
+}
+
+// NewUserService constructor of UserService struct
+func NewUserService(logger *zap.Logger) *UserService <span class="cov8" title="1">{
+        return &amp;UserService{Dao: dao.NewUserDAO(logger), logger: logger}
+}</span>
+
+// FindByID func
+func (srv UserService) FindByID(ID int) (*domain.User, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called FindByID",
+                zap.String("ID", strconv.Itoa(ID)),
+        )
+
+        return srv.Dao.FindByID(ID)
+}</span>
+
+// Create func
+func (srv UserService) Create(user domain.User) (*domain.User, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called Create",
+                zap.String("user", fmt.Sprintf("%#v", user)),
+        )
+
+        return srv.Dao.Create(user)
+}</span>
+
+// GetAll func
+func (srv UserService) GetAll() (*[]domain.User, error) <span class="cov8" title="1">{
+        // Entry log
+        srv.logger.Info("Called GetAll")
+
+        return srv.Dao.GetAll()
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
