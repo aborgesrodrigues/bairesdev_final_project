@@ -215,7 +215,7 @@ func (qh *QuestionHandler) DeleteQuestion(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	json.NewEncoder(w).Encode("File deleted")
+	json.NewEncoder(w).Encode("Question deleted")
 }
 
 // GetAllQuestions return all existing questions

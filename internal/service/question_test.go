@@ -106,8 +106,7 @@ func TestFailUpdateQuestionIncompleteStruct(t *testing.T) {
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(
-		nil, errors.New("Not all attributes are filled"))
+	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(nil, nil)
 
 	// call the service
 	question, error := service.Update(argument)

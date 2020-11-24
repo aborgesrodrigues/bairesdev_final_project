@@ -295,21 +295,11 @@ func TestGetAllQuestions(t *testing.T) {
 		ID:        1,
 		Statement: "statement 1",
 		UserID:    1,
-		User: domain.User{
-			ID:       1,
-			Username: "username1",
-			Name:     "User Name 1",
-		},
 	})
 	allQuestions = append(allQuestions, domain.Question{
 		ID:        2,
 		Statement: "statement 2",
 		UserID:    2,
-		User: domain.User{
-			ID:       2,
-			Username: "username2",
-			Name:     "User Name 2",
-		},
 	})
 
 	handler := handler.NewQuestionHandler()
@@ -346,21 +336,11 @@ func TestGetQuestionsByUser(t *testing.T) {
 		ID:        1,
 		Statement: "statement 1",
 		UserID:    1,
-		User: domain.User{
-			ID:       1,
-			Username: "username1",
-			Name:     "User Name 1",
-		},
 	})
 	allUserQuestions = append(allUserQuestions, domain.Question{
 		ID:        2,
 		Statement: "statement 2",
 		UserID:    2,
-		User: domain.User{
-			ID:       2,
-			Username: "username1",
-			Name:     "User Name 1",
-		},
 	})
 
 	handler := handler.NewQuestionHandler()
