@@ -9,21 +9,14 @@ type Question struct {
 	User      User   `gorm:"constraint:OnUpdate:RESTRICT,OnDelete:RESTRICT" json:"-"`
 }
 
-/*
-func (srv QuestionService) checkStruct(question domain.Question, checkID bool) bool {
-	// Entry log
-	srv.logger.Info("Called checkStruct",
-		zap.String("question", fmt.Sprintf("%#v", question)),
-		zap.String("checkID", strconv.FormatBool(checkID)),
-	)
-
+// IsEmpty checks if all the fields are filled
+func (question Question) IsEmpty(checkID bool) bool {
 	if (question.ID == 0 && checkID) ||
 		question.Statement == "" ||
 		question.UserID == 0 {
 
-		return false
+		return true
 	}
 
-	return true
+	return false
 }
-*/

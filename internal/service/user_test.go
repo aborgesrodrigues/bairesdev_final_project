@@ -4,7 +4,6 @@ import (
 	"bairesdev_final_project/internal/dao"
 	"bairesdev_final_project/internal/domain"
 	"bairesdev_final_project/internal/service"
-	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -41,29 +40,6 @@ func TestCreateUser(t *testing.T) {
 
 	assert.NoError(t, error)
 	assert.Equal(t, question, &argument, "they should be equal")
-}
-
-func TestFailCreateUser(t *testing.T) {
-	// Data
-	argument := domain.User{
-		Name: "User Name 1",
-	}
-
-	logger, _ := zap.NewProduction()
-
-	service := service.NewUserService(logger)
-
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	service.Dao = dao.NewMockUserDAOInterface(ctrl)
-	service.Dao.(*dao.MockUserDAOInterface).EXPECT().Create(argument).Return(
-		nil, errors.New("Not all attributes are filled"))
-
-	// call the service
-	question, error := service.Create(argument)
-
-	assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
-	assert.Nil(t, question)
 }
 
 func TestFindUserByID(t *testing.T) {

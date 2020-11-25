@@ -15,12 +15,6 @@ import (
 
 // TestCreateQuestion tests the CreateQuestion function of the handler
 func TestCreateQuestion(t *testing.T) {
-	// Data
-	argument := domain.Question{
-		Statement: "Statement 1",
-		UserID:    1,
-	}
-
 	logger, _ := zap.NewProduction()
 
 	service := service.NewQuestionService(logger)
@@ -28,54 +22,49 @@ func TestCreateQuestion(t *testing.T) {
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Create(argument).Return(
-		&domain.Question{
-			ID:        1,
-			UserID:    1,
+
+	t.Run("Sucess", func(t *testing.T) {
+		// Data
+		argument := domain.Question{
 			Statement: "Statement 1",
-		}, nil)
+			UserID:    1,
+		}
 
-	// call the service
-	question, error := service.Create(argument)
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Create(argument).Return(
+			&domain.Question{
+				ID:        1,
+				UserID:    1,
+				Statement: "Statement 1",
+			}, nil)
 
-	//included to facilitate the check with the returned value
-	argument.ID = 1
+		// call the service
+		question, error := service.Create(argument)
 
-	assert.NoError(t, error)
-	assert.Equal(t, question, &argument, "they should be equal")
-}
+		//included to facilitate the check with the returned value
+		argument.ID = 1
 
-func TestFailCreateQuestion(t *testing.T) {
-	// Data
-	argument := domain.Question{
-		UserID: 1,
-	}
+		assert.NoError(t, error)
+		assert.Equal(t, question, &argument, "they should be equal")
+	})
 
-	logger, _ := zap.NewProduction()
+	t.Run("Fail", func(t *testing.T) {
+		// Data
+		argument := domain.Question{
+			UserID: 1,
+		}
 
-	service := service.NewQuestionService(logger)
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Create(argument).Return(
+			nil, nil)
 
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Create(argument).Return(
-		nil, errors.New("Not all attributes are filled"))
+		// call the service
+		question, error := service.Create(argument)
 
-	// call the service
-	question, error := service.Create(argument)
-
-	assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
-	assert.Nil(t, question)
+		assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
+		assert.Nil(t, question)
+	})
 }
 
 func TestUpdateQuestion(t *testing.T) {
-	// Data
-	argument := domain.Question{
-		ID:        1,
-		Statement: "Statement 1",
-		UserID:    1,
-	}
-
 	logger, _ := zap.NewProduction()
 
 	service := service.NewQuestionService(logger)
@@ -83,61 +72,57 @@ func TestUpdateQuestion(t *testing.T) {
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(
-		&argument, nil)
 
-	// call the service
-	question, error := service.Update(argument)
+	t.Run("Sucess", func(t *testing.T) {
+		// Data
+		argument := domain.Question{
+			ID:        1,
+			Statement: "Statement 1",
+			UserID:    1,
+		}
 
-	assert.NoError(t, error)
-	assert.Equal(t, question, &argument, "they should be equal")
-}
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(
+			&argument, nil)
 
-func TestFailUpdateQuestionIncompleteStruct(t *testing.T) {
-	// Data
-	argument := domain.Question{
-		UserID: 1,
-	}
+		// call the service
+		question, error := service.Update(argument)
 
-	logger, _ := zap.NewProduction()
+		assert.NoError(t, error)
+		assert.Equal(t, question, &argument, "they should be equal")
+	})
 
-	service := service.NewQuestionService(logger)
+	t.Run("Fail by imcomplete struct", func(t *testing.T) {
+		// Data
+		argument := domain.Question{
+			UserID: 1,
+		}
 
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(nil, nil)
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(nil, nil)
 
-	// call the service
-	question, error := service.Update(argument)
+		// call the service
+		question, error := service.Update(argument)
 
-	assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
-	assert.Nil(t, question)
-}
+		assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
+		assert.Nil(t, question)
+	})
 
-func TestFailUpdateQuestionNotFound(t *testing.T) {
-	// Data
-	argument := domain.Question{
-		ID:        1,
-		Statement: "Statement 1",
-		UserID:    1,
-	}
+	t.Run("Fail by not found", func(t *testing.T) {
+		// Data
+		argument := domain.Question{
+			ID:        1,
+			Statement: "Statement 1",
+			UserID:    1,
+		}
 
-	logger, _ := zap.NewProduction()
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(
+			nil, errors.New("ID not found"))
 
-	service := service.NewQuestionService(logger)
+		// call the service
+		question, error := service.Update(argument)
 
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(
-		nil, errors.New("ID not found"))
-
-	// call the service
-	question, error := service.Update(argument)
-
-	assert.Equal(t, error.Error(), "ID not found", "they should be equal")
-	assert.Nil(t, question)
+		assert.Equal(t, error.Error(), "ID not found", "they should be equal")
+		assert.Nil(t, question)
+	})
 }
 
 func TestDeleteQuestion(t *testing.T) {
@@ -148,30 +133,26 @@ func TestDeleteQuestion(t *testing.T) {
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Delete(1).Return(nil)
 
-	// call the service
-	error := service.Delete(1)
+	t.Run("Sucess", func(t *testing.T) {
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Delete(1).Return(nil)
 
-	assert.NoError(t, error)
-}
+		// call the service
+		error := service.Delete(1)
 
-func TestFailDeleteQuestion(t *testing.T) {
-	logger, _ := zap.NewProduction()
+		assert.NoError(t, error)
+	})
 
-	service := service.NewQuestionService(logger)
+	t.Run("Fail", func(t *testing.T) {
+		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Delete(1).Return(
+			errors.New("ID not found"),
+		)
 
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
-	service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Delete(1).Return(
-		errors.New("ID not found"),
-	)
+		// call the service
+		error := service.Delete(1)
 
-	// call the service
-	error := service.Delete(1)
-
-	assert.Equal(t, error.Error(), "ID not found", "they should be equal")
+		assert.Equal(t, error.Error(), "ID not found", "they should be equal")
+	})
 }
 
 func TestFindQuestionByID(t *testing.T) {

@@ -34,24 +34,6 @@ func NewQuestionService(logger *zap.Logger) *QuestionService {
 	return &QuestionService{Dao: dao.NewQuestionDAO(logger), logger: logger}
 }
 
-// Check if all attributes are filled
-func (srv QuestionService) checkStruct(question domain.Question, checkID bool) bool {
-	// Entry log
-	srv.logger.Info("Called checkStruct",
-		zap.String("question", fmt.Sprintf("%#v", question)),
-		zap.String("checkID", strconv.FormatBool(checkID)),
-	)
-
-	if (question.ID == 0 && checkID) ||
-		question.Statement == "" ||
-		question.UserID == 0 {
-
-		return false
-	}
-
-	return true
-}
-
 // Create func
 func (srv QuestionService) Create(question domain.Question) (*domain.Question, error) {
 	// Entry log
@@ -59,7 +41,7 @@ func (srv QuestionService) Create(question domain.Question) (*domain.Question, e
 		zap.String("question", fmt.Sprintf("%#v", question)),
 	)
 
-	if !srv.checkStruct(question, false) {
+	if question.IsEmpty(false) {
 		//log
 		message := "Not all attributes are filled"
 		srv.logger.Info(message,
@@ -78,7 +60,7 @@ func (srv QuestionService) Update(question domain.Question) (*domain.Question, e
 		zap.String("question", fmt.Sprintf("%#v", question)),
 	)
 
-	if !srv.checkStruct(question, true) {
+	if question.IsEmpty(true) {
 		//log
 		message := "Not all attributes are filled"
 		srv.logger.Info(message,

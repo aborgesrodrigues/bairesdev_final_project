@@ -22,221 +22,212 @@ import (
 
 // TestCreateQuestion tests the CreateQuestion function of the handler
 func TestCreateQuestion(t *testing.T) {
-	// Data
-	payload := domain.Question{
-		Statement: "Statement 1",
-		UserID:    1,
-	}
-	data, marshalError := json.Marshal(payload)
-
 	handler := handler.NewQuestionHandler()
 
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Create(payload).Return(
-		&domain.Question{
-			ID:        1,
-			UserID:    1,
+
+	t.Run("Sucess", func(t *testing.T) {
+		// Data
+		payload := domain.Question{
 			Statement: "Statement 1",
-		}, nil)
+			UserID:    1,
+		}
+		data, marshalError := json.Marshal(payload)
 
-	// do the request
-	req := httptest.NewRequest("POST", "/question", strings.NewReader(string(data)))
-	w := httptest.NewRecorder()
-	handler.CreateQuestion(w, req)
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Create(payload).Return(
+			&domain.Question{
+				ID:        1,
+				UserID:    1,
+				Statement: "Statement 1",
+			}, nil)
 
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
+		// do the request
+		req := httptest.NewRequest("POST", "/question", strings.NewReader(string(data)))
+		w := httptest.NewRecorder()
+		handler.CreateQuestion(w, req)
 
-	question := domain.Question{}
-	unMarshalErr := json.Unmarshal(resBody, &question)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
 
-	//included to facilitate the check with the returned value
-	payload.ID = 1
+		question := domain.Question{}
+		unMarshalErr := json.Unmarshal(resBody, &question)
 
-	assert.NoError(t, marshalError)
-	assert.NoError(t, bodyErr)
-	assert.NoError(t, unMarshalErr)
-	assert.Equal(t, res.StatusCode, http.StatusCreated, "they should be equal")
-	assert.Equal(t, question, payload, "they should be equal")
-}
+		//included to facilitate the check with the returned value
+		payload.ID = 1
 
-func TestFailCreateQuestion(t *testing.T) {
-	// Data
-	payload := domain.Question{
-		Statement: "Statement 1",
-	}
-	data, marshalError := json.Marshal(payload)
+		assert.NoError(t, marshalError)
+		assert.NoError(t, bodyErr)
+		assert.NoError(t, unMarshalErr)
+		assert.Equal(t, res.StatusCode, http.StatusCreated, "they should be equal")
+		assert.Equal(t, question, payload, "they should be equal")
+	})
 
-	handler := handler.NewQuestionHandler()
+	t.Run("Fail", func(t *testing.T) {
+		// Data
+		payload := domain.Question{
+			Statement: "Statement 1",
+		}
 
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Create(payload).Return(
-		&domain.Question{}, errors.New("Not all attributes are filled"))
+		data, marshalError := json.Marshal(payload)
 
-	// do the request
-	req := httptest.NewRequest("POST", "/question", strings.NewReader(string(data)))
-	w := httptest.NewRecorder()
-	handler.CreateQuestion(w, req)
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Create(payload).Return(
+			&domain.Question{}, errors.New("Not all attributes are filled"))
 
-	res := w.Result()
-	defer res.Body.Close()
-	_, bodyErr := ioutil.ReadAll(res.Body)
+		// do the request
+		req := httptest.NewRequest("POST", "/question", strings.NewReader(string(data)))
+		w := httptest.NewRecorder()
+		handler.CreateQuestion(w, req)
 
-	assert.NoError(t, marshalError)
-	assert.NoError(t, bodyErr)
-	assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+		res := w.Result()
+		defer res.Body.Close()
+		_, bodyErr := ioutil.ReadAll(res.Body)
+
+		assert.NoError(t, marshalError)
+		assert.NoError(t, bodyErr)
+		assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+	})
 }
 
 func TestUpdateQuestion(t *testing.T) {
-	// Data
-	payload := domain.Question{
-		ID:        1,
-		Statement: "Statement 1",
-		UserID:    1,
-	}
-	data, marshalError := json.Marshal(payload)
-
 	handler := handler.NewQuestionHandler()
+
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
-		&domain.Question{
+
+	t.Run("Sucess", func(t *testing.T) {
+		// Data
+		payload := domain.Question{
 			ID:        1,
 			Statement: "Statement 1",
 			UserID:    1,
-		}, nil)
+		}
+		data, marshalError := json.Marshal(payload)
 
-	// create router
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
+			&domain.Question{
+				ID:        1,
+				Statement: "Statement 1",
+				UserID:    1,
+			}, nil)
 
-	// create request
-	req := httptest.NewRequest("PUT", "/question/1", strings.NewReader(string(data)))
-	w := httptest.NewRecorder()
+		// create router
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
 
-	router.ServeHTTP(w, req)
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
+		// create request
+		req := httptest.NewRequest("PUT", "/question/1", strings.NewReader(string(data)))
+		w := httptest.NewRecorder()
 
-	question := domain.Question{}
-	unMarshalErr := json.Unmarshal(resBody, &question)
+		router.ServeHTTP(w, req)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
 
-	assert.NoError(t, marshalError)
-	assert.NoError(t, bodyErr)
-	assert.NoError(t, unMarshalErr)
-	assert.Equal(t, res.StatusCode, http.StatusOK, "they should be equal")
-	assert.Equal(t, question, payload, "they should be equal")
-}
+		question := domain.Question{}
+		unMarshalErr := json.Unmarshal(resBody, &question)
 
-func TestFailUpdateQuestionDifferentID(t *testing.T) {
-	// Data
-	payload := domain.Question{
-		ID:        1,
-		Statement: "Statement 1",
-		UserID:    1,
-	}
-	data, marshalError := json.Marshal(payload)
+		assert.NoError(t, marshalError)
+		assert.NoError(t, bodyErr)
+		assert.NoError(t, unMarshalErr)
+		assert.Equal(t, res.StatusCode, http.StatusOK, "they should be equal")
+		assert.Equal(t, question, payload, "they should be equal")
+	})
 
-	handler := handler.NewQuestionHandler()
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
-		nil, nil)
+	t.Run("Fail by different ID", func(t *testing.T) {
+		// Data
+		payload := domain.Question{
+			ID:        1,
+			Statement: "Statement 1",
+			UserID:    1,
+		}
+		data, marshalError := json.Marshal(payload)
 
-	// create router
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
+			nil, nil)
 
-	// create request
-	req := httptest.NewRequest("PUT", "/question/2", strings.NewReader(string(data)))
-	w := httptest.NewRecorder()
+		// create router
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
 
-	router.ServeHTTP(w, req)
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
+		// create request
+		req := httptest.NewRequest("PUT", "/question/2", strings.NewReader(string(data)))
+		w := httptest.NewRecorder()
 
-	assert.NoError(t, marshalError)
-	assert.NoError(t, bodyErr)
-	assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
-	assert.Equal(t, string(resBody), "ID of the question is different of the parameter", "they should be equal")
-}
+		router.ServeHTTP(w, req)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
 
-func TestFailUpdateQuestionIncompleteBody(t *testing.T) {
-	// Data
-	payload := domain.Question{
-		ID:     10,
-		UserID: 1,
-	}
-	data, marshalError := json.Marshal(payload)
+		assert.NoError(t, marshalError)
+		assert.NoError(t, bodyErr)
+		assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+		assert.Equal(t, string(resBody), "ID of the question is different of the parameter", "they should be equal")
+	})
 
-	handler := handler.NewQuestionHandler()
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
-		&domain.Question{}, errors.New("Not all attributes are filled"))
+	t.Run("Fail by incomplete body", func(t *testing.T) {
+		// Data
+		payload := domain.Question{
+			ID:     10,
+			UserID: 1,
+		}
+		data, marshalError := json.Marshal(payload)
 
-	// create router
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
+			&domain.Question{}, errors.New("Not all attributes are filled"))
 
-	// create request
-	req := httptest.NewRequest("PUT", "/question/10", strings.NewReader(string(data)))
-	w := httptest.NewRecorder()
+		// create router
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
 
-	router.ServeHTTP(w, req)
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
+		// create request
+		req := httptest.NewRequest("PUT", "/question/10", strings.NewReader(string(data)))
+		w := httptest.NewRecorder()
 
-	assert.NoError(t, marshalError)
-	assert.NoError(t, bodyErr)
-	assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
-	assert.Equal(t, string(resBody), "Not all attributes are filled", "they should be equal")
-}
+		router.ServeHTTP(w, req)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
 
-func TestFailUpdateQuestionNotFound(t *testing.T) {
-	// Data
-	payload := domain.Question{
-		ID:        10,
-		Statement: "Statement 1",
-		UserID:    1,
-	}
-	data, marshalError := json.Marshal(payload)
+		assert.NoError(t, marshalError)
+		assert.NoError(t, bodyErr)
+		assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+		assert.Equal(t, string(resBody), "Not all attributes are filled", "they should be equal")
+	})
 
-	handler := handler.NewQuestionHandler()
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
-		&payload, errors.New("ID not found"))
+	t.Run("Fail by question not found", func(t *testing.T) {
+		// Data
+		payload := domain.Question{
+			ID:        10,
+			Statement: "Statement 1",
+			UserID:    1,
+		}
+		data, marshalError := json.Marshal(payload)
 
-	// create router
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Update(payload).Return(
+			&payload, errors.New("ID not found"))
 
-	// create request
-	req := httptest.NewRequest("PUT", "/question/1", strings.NewReader(string(data)))
-	w := httptest.NewRecorder()
+		// create router
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/question/{id}", handler.UpdateQuestion).Methods("PUT")
 
-	router.ServeHTTP(w, req)
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
+		// create request
+		req := httptest.NewRequest("PUT", "/question/1", strings.NewReader(string(data)))
+		w := httptest.NewRecorder()
 
-	assert.NoError(t, marshalError)
-	assert.NoError(t, bodyErr)
-	assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
-	assert.Equal(t, string(resBody), "ID of the question is different of the parameter", "they should be equal")
+		router.ServeHTTP(w, req)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
+
+		assert.NoError(t, marshalError)
+		assert.NoError(t, bodyErr)
+		assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+		assert.Equal(t, string(resBody), "ID of the question is different of the parameter", "they should be equal")
+	})
 }
 
 func TestDeleteQuestion(t *testing.T) {
@@ -244,49 +235,48 @@ func TestDeleteQuestion(t *testing.T) {
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Delete(1).Return(nil)
 
-	// create router
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/question/{id}", handler.DeleteQuestion).Methods("DELETE")
+	t.Run("Sucess", func(t *testing.T) {
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Delete(1).Return(nil)
 
-	// create request
-	req := httptest.NewRequest("DELETE", "/question/1", nil)
-	w := httptest.NewRecorder()
+		// create router
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/question/{id}", handler.DeleteQuestion).Methods("DELETE")
 
-	router.ServeHTTP(w, req)
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
-	fmt.Println(resBody)
+		// create request
+		req := httptest.NewRequest("DELETE", "/question/1", nil)
+		w := httptest.NewRecorder()
 
-	assert.NoError(t, bodyErr)
-	assert.Equal(t, res.StatusCode, http.StatusOK, "they should be equal")
-}
+		router.ServeHTTP(w, req)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
+		fmt.Println(resBody)
 
-func TestFailDeleteQuestion(t *testing.T) {
-	handler := handler.NewQuestionHandler()
-	// create the question mock interface
-	ctrl := gomock.NewController(t)
-	handler.Service = service.NewMockQuestionServiceInterface(ctrl)
-	handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Delete(10).Return(errors.New("ID not found"))
+		assert.NoError(t, bodyErr)
+		assert.Equal(t, res.StatusCode, http.StatusOK, "they should be equal")
+	})
 
-	// create router
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/question/{id}", handler.DeleteQuestion).Methods("DELETE")
+	t.Run("Fail", func(t *testing.T) {
+		handler.Service.(*service.MockQuestionServiceInterface).EXPECT().Delete(10).Return(errors.New("ID not found"))
 
-	// create request
-	req := httptest.NewRequest("DELETE", "/question/10", nil)
-	w := httptest.NewRecorder()
+		// create router
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/question/{id}", handler.DeleteQuestion).Methods("DELETE")
 
-	router.ServeHTTP(w, req)
-	res := w.Result()
-	defer res.Body.Close()
-	resBody, bodyErr := ioutil.ReadAll(res.Body)
-	fmt.Println(resBody)
+		// create request
+		req := httptest.NewRequest("DELETE", "/question/10", nil)
+		w := httptest.NewRecorder()
 
-	assert.NoError(t, bodyErr)
-	assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+		router.ServeHTTP(w, req)
+		res := w.Result()
+		defer res.Body.Close()
+		resBody, bodyErr := ioutil.ReadAll(res.Body)
+		fmt.Println(resBody)
+
+		assert.NoError(t, bodyErr)
+		assert.Equal(t, res.StatusCode, http.StatusBadRequest, "they should be equal")
+	})
 }
 
 func TestGetAllQuestions(t *testing.T) {
