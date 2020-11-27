@@ -84,11 +84,12 @@ func (d *dao) update(domainStruct interface{}) (interface{}, error) {
 		)
 		return domainStruct, tx.Error
 	} else if tx.RowsAffected == 0 {
+		message := "ID not found"
 		// log
-		d.logger.Error(tx.Error.Error(),
+		d.logger.Error(message,
 			zap.String("domainStruct", fmt.Sprintf("%#v", domainStruct)),
 		)
-		return domainStruct, errors.New("ID not found")
+		return domainStruct, errors.New(message)
 	}
 
 	return domainStruct, nil

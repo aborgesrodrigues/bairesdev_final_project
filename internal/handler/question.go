@@ -64,7 +64,7 @@ func (qh *QuestionHandler) CreateQuestion(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	createdQuestion, error := qh.Service.Create(question)
+	createdQuestion, error := qh.Service.Create(r.Context(), question)
 
 	if error != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -162,7 +162,7 @@ func (qh *QuestionHandler) UpdateQuestion(w http.ResponseWriter, r *http.Request
 	}
 
 	// call the service to update the question
-	updatedQuestion, error := qh.Service.Update(question)
+	updatedQuestion, error := qh.Service.Update(r.Context(), question)
 
 	if error != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -201,7 +201,7 @@ func (qh *QuestionHandler) DeleteQuestion(w http.ResponseWriter, r *http.Request
 	}
 
 	// call the service to update the question
-	error := qh.Service.Delete(intID)
+	error := qh.Service.Delete(r.Context(), intID)
 
 	if error != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -228,7 +228,7 @@ func (qh *QuestionHandler) GetAllQuestions(w http.ResponseWriter, r *http.Reques
 		zap.String("url", r.URL.Path),
 	)
 
-	questions, error := qh.Service.GetAll()
+	questions, error := qh.Service.GetAll(r.Context())
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())
@@ -271,7 +271,7 @@ func (qh *QuestionHandler) GetQuestionsByUser(w http.ResponseWriter, r *http.Req
 	}
 
 	// call the service to find question by user
-	questions, error := qh.Service.FindByUser(intUserID)
+	questions, error := qh.Service.FindByUser(r.Context(), intUserID)
 
 	if error != nil {
 		fmt.Fprintf(w, error.Error())

@@ -3,6 +3,7 @@ module bairesdev_final_project
 go 1.15
 
 require (
+	github.com/go-kit/kit v0.10.0
 	github.com/golang/mock v1.4.4
 	github.com/gorilla/mux v1.8.0
 	github.com/mattn/go-sqlite3 v1.14.5 // indirect

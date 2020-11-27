@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -23,6 +24,8 @@ func TestCreateQuestion(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
 
+	ctx := context.Background()
+
 	t.Run("Sucess", func(t *testing.T) {
 		// Data
 		argument := domain.Question{
@@ -38,7 +41,7 @@ func TestCreateQuestion(t *testing.T) {
 			}, nil)
 
 		// call the service
-		question, error := service.Create(argument)
+		question, error := service.Create(ctx, argument)
 
 		//included to facilitate the check with the returned value
 		argument.ID = 1
@@ -57,7 +60,7 @@ func TestCreateQuestion(t *testing.T) {
 			nil, nil)
 
 		// call the service
-		question, error := service.Create(argument)
+		question, error := service.Create(ctx, argument)
 
 		assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
 		assert.Nil(t, question)
@@ -73,6 +76,8 @@ func TestUpdateQuestion(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
 
+	ctx := context.Background()
+
 	t.Run("Sucess", func(t *testing.T) {
 		// Data
 		argument := domain.Question{
@@ -85,7 +90,7 @@ func TestUpdateQuestion(t *testing.T) {
 			&argument, nil)
 
 		// call the service
-		question, error := service.Update(argument)
+		question, error := service.Update(ctx, argument)
 
 		assert.NoError(t, error)
 		assert.Equal(t, question, &argument, "they should be equal")
@@ -100,7 +105,7 @@ func TestUpdateQuestion(t *testing.T) {
 		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Update(argument).Return(nil, nil)
 
 		// call the service
-		question, error := service.Update(argument)
+		question, error := service.Update(ctx, argument)
 
 		assert.Equal(t, error.Error(), "Not all attributes are filled", "they should be equal")
 		assert.Nil(t, question)
@@ -118,7 +123,7 @@ func TestUpdateQuestion(t *testing.T) {
 			nil, errors.New("ID not found"))
 
 		// call the service
-		question, error := service.Update(argument)
+		question, error := service.Update(ctx, argument)
 
 		assert.Equal(t, error.Error(), "ID not found", "they should be equal")
 		assert.Nil(t, question)
@@ -134,11 +139,13 @@ func TestDeleteQuestion(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
 
+	ctx := context.Background()
+
 	t.Run("Sucess", func(t *testing.T) {
 		service.Dao.(*dao.MockQuestionDAOInterface).EXPECT().Delete(1).Return(nil)
 
 		// call the service
-		error := service.Delete(1)
+		error := service.Delete(ctx, 1)
 
 		assert.NoError(t, error)
 	})
@@ -149,7 +156,7 @@ func TestDeleteQuestion(t *testing.T) {
 		)
 
 		// call the service
-		error := service.Delete(1)
+		error := service.Delete(ctx, 1)
 
 		assert.Equal(t, error.Error(), "ID not found", "they should be equal")
 	})
@@ -164,6 +171,7 @@ func TestFindQuestionByID(t *testing.T) {
 	logger, _ := zap.NewProduction()
 
 	service := service.NewQuestionService(logger)
+	ctx := context.Background()
 
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
@@ -173,7 +181,7 @@ func TestFindQuestionByID(t *testing.T) {
 	)
 
 	// call the service
-	question, error := service.FindByID(1)
+	question, error := service.FindByID(ctx, 1)
 
 	assert.NoError(t, error)
 	assert.Equal(t, question, &foundQuestion, "they should be equal")
@@ -195,6 +203,8 @@ func TestFindQuestionsByUser(t *testing.T) {
 
 	service := service.NewQuestionService(logger)
 
+	ctx := context.Background()
+
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
@@ -203,7 +213,7 @@ func TestFindQuestionsByUser(t *testing.T) {
 	)
 
 	// call the service
-	questions, error := service.FindByUser(1)
+	questions, error := service.FindByUser(ctx, 1)
 
 	assert.NoError(t, error)
 	assert.Equal(t, questions, &userQuestions, "they should be equal")
@@ -225,6 +235,8 @@ func TestGetAllQuestions(t *testing.T) {
 
 	service := service.NewQuestionService(logger)
 
+	ctx := context.Background()
+
 	// create the question mock interface
 	ctrl := gomock.NewController(t)
 	service.Dao = dao.NewMockQuestionDAOInterface(ctrl)
@@ -233,7 +245,7 @@ func TestGetAllQuestions(t *testing.T) {
 	)
 
 	// call the service
-	questions, error := service.GetAll()
+	questions, error := service.GetAll(ctx)
 
 	assert.NoError(t, error)
 	assert.Equal(t, questions, &allQuestions, "they should be equal")

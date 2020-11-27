@@ -1,17 +1,18 @@
 package main
 
 import (
+	server "bairesdev_final_project/server/rest"
 	"log"
 	"net/http"
-
-	"bairesdev_final_project/internal/handler"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
-	handler.CreateUserRouters(router)
-	handler.CreateQuestionRouters(router)
+
+	server := server.NewServer()
+	server.CreateRouters(router)
+
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

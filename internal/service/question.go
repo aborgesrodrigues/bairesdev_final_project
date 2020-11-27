@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -21,12 +22,12 @@ type QuestionService struct {
 
 //QuestionServiceInterface interface
 type QuestionServiceInterface interface {
-	Create(domain.Question) (*domain.Question, error)
-	Update(domain.Question) (*domain.Question, error)
-	Delete(int) error
-	FindByID(int) (*domain.Question, error)
-	FindByUser(int) (*[]domain.Question, error)
-	GetAll() (*[]domain.Question, error)
+	Create(context.Context, domain.Question) (*domain.Question, error)
+	Update(context.Context, domain.Question) (*domain.Question, error)
+	Delete(context.Context, int) error
+	FindByID(context.Context, int) (*domain.Question, error)
+	FindByUser(context.Context, int) (*[]domain.Question, error)
+	GetAll(context.Context) (*[]domain.Question, error)
 }
 
 // NewQuestionService constructor of QuestionService struct
@@ -35,7 +36,7 @@ func NewQuestionService(logger *zap.Logger) *QuestionService {
 }
 
 // Create func
-func (srv QuestionService) Create(question domain.Question) (*domain.Question, error) {
+func (srv QuestionService) Create(_ context.Context, question domain.Question) (*domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called Create",
 		zap.String("question", fmt.Sprintf("%#v", question)),
@@ -54,7 +55,7 @@ func (srv QuestionService) Create(question domain.Question) (*domain.Question, e
 }
 
 // Update func
-func (srv QuestionService) Update(question domain.Question) (*domain.Question, error) {
+func (srv QuestionService) Update(_ context.Context, question domain.Question) (*domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called Update",
 		zap.String("question", fmt.Sprintf("%#v", question)),
@@ -74,7 +75,7 @@ func (srv QuestionService) Update(question domain.Question) (*domain.Question, e
 }
 
 // Delete func
-func (srv QuestionService) Delete(ID int) error {
+func (srv QuestionService) Delete(_ context.Context, ID int) error {
 	// Entry log
 	srv.logger.Info("Called Delete",
 		zap.String("ID", strconv.Itoa(ID)),
@@ -84,7 +85,7 @@ func (srv QuestionService) Delete(ID int) error {
 }
 
 // FindByID func
-func (srv QuestionService) FindByID(ID int) (*domain.Question, error) {
+func (srv QuestionService) FindByID(_ context.Context, ID int) (*domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called FindByID",
 		zap.String("ID", strconv.Itoa(ID)),
@@ -94,7 +95,7 @@ func (srv QuestionService) FindByID(ID int) (*domain.Question, error) {
 }
 
 // FindByUser func
-func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) {
+func (srv QuestionService) FindByUser(_ context.Context, userID int) (*[]domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called FindByUser",
 		zap.String("userID", strconv.Itoa(userID)),
@@ -104,7 +105,7 @@ func (srv QuestionService) FindByUser(userID int) (*[]domain.Question, error) {
 }
 
 // GetAll func
-func (srv QuestionService) GetAll() (*[]domain.Question, error) {
+func (srv QuestionService) GetAll(_ context.Context) (*[]domain.Question, error) {
 	// Entry log
 	srv.logger.Info("Called GetAll")
 
